@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B3C5D">
+<title>HOPT Intelligence Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B3C5D;--navy-2:#0F4C75;--teal:#1D7874;--orange:#E07A1F;--orange-50:#FDF1E6;
+  --red:#C2410C;--red-50:#FDECEC;--green:#15803D;--green-50:#E8F5EC;--ink:#1F2933;--mute:#64748B;--line:#E2E8F0;
+  --bg:#F4F7FA;--card:#FFFFFF;--shadow:0 1px 2px rgba(15,40,70,.06),0 4px 16px rgba(15,40,70,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
+a{color:var(--navy-2);text-decoration:none}a:hover{text-decoration:underline}
+button{font:inherit}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+.top{background:linear-gradient(120deg,var(--navy) 0%,var(--navy-2) 60%,var(--teal) 100%);color:#fff;padding:18px 24px 64px}
+.top-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.mark{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-weight:700;font-size:13px;border:1px solid rgba(255,255,255,.25);flex:none}
+.brand h1{margin:0;font-size:20px;font-weight:700}
+.brand p{margin:0;font-size:12.5px;opacity:.8}
+.top-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:6px 12px;font-size:12.5px;display:flex;align-items:center;gap:8px;color:#fff}
+button.chip{cursor:pointer}button.chip:hover{background:rgba(255,255,255,.2)}
+.lang{display:flex;border:1px solid rgba(255,255,255,.3);border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;color:#fff;padding:6px 11px;cursor:pointer;font-size:12.5px;font-weight:600;opacity:.7}
+.lang button[aria-pressed=true]{background:rgba(255,255,255,.22);opacity:1}
+.dot{width:8px;height:8px;border-radius:50%;background:#94A3B8;flex:none}.dot.live{background:#4ADE80;box-shadow:0 0 0 3px rgba(74,222,128,.25)}.dot.warn{background:#FBBF24}
+main{max-width:1240px;margin:-44px auto 0;padding:0 20px 40px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+.kpi .v{font-size:28px;font-weight:700;color:var(--navy);line-height:1.1}
+.kpi .l{color:var(--mute);font-size:12.5px;margin-top:4px}
+.kpi .s{font-size:11.5px;color:var(--mute);margin-top:6px}
+.tabs{display:flex;gap:4px;margin:22px 0 14px;border-bottom:1px solid var(--line);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tab{padding:10px 16px;border:0;background:none;font-weight:600;color:var(--mute);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap}
+.tab[aria-selected=true]{color:var(--navy);border-color:var(--teal)}
+.view{display:none}.view.on{display:block}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid.one{grid-template-columns:1fr}
+.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card-h{display:flex;gap:12px;align-items:flex-start}
+.ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none;font-weight:700;font-size:13px;color:#fff}
+.card-h h3{margin:0;font-size:15.5px;line-height:1.3}
+.card-h .meta{color:var(--mute);font-size:12px;margin-top:2px}
+.pill{margin-left:auto;flex:none;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.p-ok{background:var(--green-50);color:var(--green)}.p-err{background:var(--red-50);color:var(--red)}.p-wait{background:#F1F5F9;color:var(--mute)}.p-old{background:var(--orange-50);color:var(--orange)}
+.minis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mini{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+.mini b{display:block;font-size:16px;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini span{font-size:11px;color:var(--mute);display:block;line-height:1.3}
+.hl{margin:0;padding-left:18px}.hl li{margin:3px 0}
+.empty{color:var(--mute);font-size:13px;background:#F8FAFC;border:1px dashed var(--line);border-radius:10px;padding:12px}
+.foot{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;border-top:1px solid var(--line);padding-top:10px;margin-top:auto;color:var(--mute)}
+.flag{display:inline-flex;gap:5px;align-items:center}
+.flag i{width:7px;height:7px;border-radius:50%;display:inline-block;background:#CBD5E1}.flag i.g{background:var(--green)}.flag i.r{background:var(--red)}
+.sec{margin-top:22px}.sec h2{font-size:16px;margin:0 0 10px;color:var(--navy)}.sec .sub{color:var(--mute);font-size:12.5px;margin:-6px 0 12px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;background:var(--card);font-size:13px;min-width:560px}
+th{background:var(--navy);color:#fff;font-weight:600;text-align:left;padding:9px 12px;font-size:12px}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}
+.conf{border-radius:6px;padding:2px 8px;font-size:11.5px;font-weight:600}
+.c-Cao{background:var(--green-50);color:var(--green)}.c-Vừa{background:var(--orange-50);color:var(--orange)}.c-Thấp{background:#F1F5F9;color:var(--mute)}
+.heat{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;overflow-x:auto}
+.hm{display:grid;gap:4px;align-items:center;min-width:620px}
+.hm .lab{font-size:12px;color:var(--mute);white-space:nowrap;padding-right:8px}.hm .d{font-size:10.5px;color:var(--mute);text-align:center}
+.cell{height:22px;border-radius:5px;background:#EEF2F6}.cell.ok{background:var(--teal)}.cell.err{background:var(--red)}.cell.part{background:var(--orange)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-top:10px}
+.legend span{display:inline-flex;gap:6px;align-items:center}.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.banner{background:var(--orange-50);color:#7C3E06;border:1px solid #F6D2AE;border-radius:10px;padding:10px 14px;margin-top:14px;font-size:13px;display:none}
+/* login */
+.login{position:fixed;inset:0;background:rgba(11,60,93,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.login.on{display:flex}
+.lbox{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);width:100%;max-width:420px;padding:26px 24px}
+.lbox h2{margin:0 0 4px;color:var(--navy);font-size:20px}.lbox p{margin:0 0 16px;color:var(--mute);font-size:13px}
+.lbox label{display:block;font-size:12.5px;font-weight:600;margin:12px 0 6px}
+.lbox select,.lbox input{width:100%;padding:11px 12px;border:1px solid #CBD5E1;border-radius:10px;font:inherit;font-size:15px;background:#fff}
+.lbox select:focus,.lbox input:focus{outline:2px solid var(--teal);border-color:transparent}
+.lbtn{margin-top:18px;width:100%;padding:12px;border:0;border-radius:10px;background:var(--navy);color:#fff;font-weight:600;font-size:15px;cursor:pointer}
+.lbtn[disabled]{opacity:.6;cursor:wait}
+.lerr{color:var(--red);font-size:13px;min-height:18px;margin-top:10px}
+.lnote{font-size:11.5px;color:var(--mute);margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.llang{display:flex;justify-content:flex-end;gap:6px;margin-bottom:6px}
+.llang button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer}
+.llang button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line)}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.minis{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.top{padding:14px 14px 58px}.brand h1{font-size:17px}.brand p{display:none}.top-right{margin-left:0;width:100%}
+  .chip{padding:5px 10px;font-size:11.5px}#nextRun{display:none}main{padding:0 12px 32px}.kpi{padding:12px 14px}.kpi .v{font-size:23px}.kpi .s{display:none}
+  .card{padding:15px}.tab{padding:10px 12px}footer{padding:16px 12px 26px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="mark">HOPT</div>
+      <div><h1>HOPT Intelligence Hub</h1><p data-i="tagline"></p></div>
+    </div>
+    <div class="top-right">
+      <div class="lang" role="group" aria-label="Language"><button data-lang="vi">VI</button><button data-lang="en">EN</button></div>
+      <div class="chip"><span class="dot" id="connDot"></span><span id="connTxt"></span></div>
+      <div class="chip mono" id="clock">--:--</div>
+      <div class="chip" id="nextRun"></div>
+      <button class="chip" id="userChip" style="display:none"></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="kpis">
+    <div class="kpi"><div class="v" id="kReported">–</div><div class="l" data-i="kReported"></div><div class="s" data-i="kReportedS"></div></div>
+    <div class="kpi"><div class="v" id="kEmail">–</div><div class="l" data-i="kEmail"></div><div class="s" data-i="kEmailS"></div></div>
+    <div class="kpi"><div class="v" id="kAttach">–</div><div class="l" data-i="kAttach"></div><div class="s" data-i="kAttachS"></div></div>
+    <div class="kpi"><div class="v" id="kErr">–</div><div class="l" data-i="kErr"></div><div class="s" id="kErrS"></div></div>
+  </section>
+  <div class="banner" id="banner"></div>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-v="today" data-i="tToday"></button>
+    <button class="tab" role="tab" data-v="week" data-i="tWeek"></button>
+    <button class="tab" role="tab" data-v="year" data-i="tYear"></button>
+    <button class="tab" role="tab" data-v="log" data-i="tLog"></button>
+  </nav>
+
+  <section class="view" id="v-today">
+    <div class="grid" id="todayGrid"></div>
+    <div class="sec" id="recoSec">
+      <h2 data-i="recoH"></h2>
+      <p class="sub" id="recoSub"></p>
+      <div id="recoBox"></div>
+    </div>
+  </section>
+  <section class="view" id="v-week"><div class="grid" id="weekGrid"></div></section>
+  <section class="view" id="v-year"><div class="grid" id="yearGrid"></div></section>
+  <section class="view" id="v-log">
+    <div class="sec" style="margin-top:0"><h2 data-i="logH14"></h2>
+      <div class="heat"><div class="hm" id="heat"></div>
+        <div class="legend"><span><i style="background:var(--teal)"></i><b data-i="lgOk" style="font-weight:400"></b></span><span><i style="background:var(--orange)"></i><b data-i="lgPart" style="font-weight:400"></b></span><span><i style="background:var(--red)"></i><b data-i="lgErr" style="font-weight:400"></b></span><span><i style="background:#EEF2F6"></i><b data-i="lgNone" style="font-weight:400"></b></span></div>
+      </div></div>
+    <div class="sec"><h2 data-i="logRecent"></h2><div id="logTable"></div></div>
+  </section>
+</main>
+
+<footer>
+  <span><span data-i="design"></span>: <a href="https://htsolutiontech.github.io/AIConsulting/">Mr Thuong AgenticAI</a></span>
+  <span data-i="footNote"></span>
+</footer>
+
+<div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="lTitle">
+  <form class="lbox" id="lform" autocomplete="on">
+    <div class="llang"><button type="button" data-lang="vi">VI</button><button type="button" data-lang="en">EN</button></div>
+    <h2 id="lTitle" data-i="lTitle"></h2>
+    <p data-i="lSub"></p>
+    <label for="lRole" data-i="lRole"></label>
+    <select id="lRole" name="username" autocomplete="username"></select>
+    <label for="lPw" data-i="lPw"></label>
+    <input id="lPw" type="password" name="password" autocomplete="current-password" required minlength="8">
+    <button class="lbtn" id="lBtn" type="submit" data-i="lBtn"></button>
+    <div class="lerr" id="lErr" role="alert"></div>
+    <div class="lnote" data-i="lNote"></div>
+  </form>
+</div>
+
+<script>
+(() => {
+  // ================= i18n =================
+  const I18N = {
+    vi:{tagline:"Radar thiết bị · Tài chính · Đầu tư & M&A · Chiến lược", kReported:"Agent đã báo cáo hôm nay", kReportedS:"Thứ Hai–Thứ Sáu, trước 9h00",
+      kEmail:"Email gửi thành công hôm nay", kEmailS:"tới hộp thư Giám đốc", kAttach:"Có đủ PDF + infographic", kAttachS:"trong các email hôm nay",
+      kErr:"Lượt lỗi 14 ngày qua", kErrS:"trên {n} lượt chạy", tToday:"Hôm nay", tWeek:"Tổng hợp tuần", tYear:"Tổng kết năm", tLog:"Nhật ký vận hành",
+      recoH:"Khuyến nghị quyết định mới nhất (Agent 4)", recoSubDef:"Tổng hợp từ Agent 1–3 và tra cứu chính sách; chi tiết và bằng chứng trong email/PDF của Agent 4.",
+      recoSub:"Theo báo cáo Agent 4 ngày {d}. Chi tiết, bằng chứng và nguồn trong email/PDF của Agent 4.", recoEmptyNone:"Chưa có khuyến nghị. Agent 4 chạy lúc 08:46 các ngày Thứ 2–6, sau Agent 1–3.",
+      recoEmptyRun:"Lượt gần nhất của Agent 4 chưa ghi khuyến nghị.", thNo:"#", thDecision:"Quyết định đề xuất", thConf:"Mức tin cậy", thNext7:"Việc trong 7 ngày",
+      logH14:"14 ngày gần nhất", logRecent:"Lượt chạy gần đây", lgOk:"Thành công", lgPart:"Email thiếu đính kèm", lgErr:"Lỗi", lgNone:"Không có lượt chạy",
+      design:"Thiết kế", footNote:"Thông tin chỉ mang tính gợi ý tham khảo · Dữ liệu do các HOPT Agent ghi sau mỗi lượt chạy",
+      stDone:"Hoàn tất", stErr:"Lỗi", stWait:"Chưa chạy", stPart:"Thiếu đính kèm", stOld:"Bản cũ – {d}", updated:"cập nhật", openEmail:"Mở email báo cáo ↗",
+      emailSent:"Email đã gửi", emailNot:"Email chưa gửi", attOk:"PDF + infographic", attNo:"Không có đính kèm", noHl:"Lượt chạy chưa ghi điểm chính.", note:"Ghi chú",
+      emptyToday:"Chưa có báo cáo hôm nay. Lượt chạy lúc {t}.", emptyWeekend:"Hôm nay không có lịch chạy (Thứ 2–6).",
+      emptyWeek:"Chưa có báo cáo tuần. Lượt đầu tiên: Thứ Bảy, 08:40.", emptyYear:"Báo cáo năm chạy lúc 08:40 ngày 31/12, gồm tổng kết năm, các kịch bản năm tới và 5 ưu tiên chiến lược.",
+      emptyLog:"Chưa có lượt chạy nào được ghi.", thDate:"Ngày", thAgent:"Agent", thStatus:"Trạng thái", thEmail:"Email", thAtt:"Đính kèm", thDone:"Hoàn tất lúc", thNote:"Ghi chú",
+      yes:"Có", no:"Không", sent:"Đã gửi", notSent:"Chưa", weekly:"Tổng hợp tuần", yearly:"Tổng kết năm", nextRun:"Lượt kế tiếp", inMin:"sau {m} phút", inHM:"sau {h} giờ {m} phút",
+      connWait:"Đang kết nối dữ liệu…", connLive:"Dữ liệu trực tiếp · {n} lượt", connSync:"Đang đồng bộ…", connRepo:"Dữ liệu thật từ repo · {n} lượt · cập nhật {t}",
+      connNo:"Chưa có dữ liệu", connDemo:"ĐANG XEM DỮ LIỆU MẪU", connLocked:"Đã mã hóa – cần đăng nhập",
+      bNoDb:"Không đọc được data/runs.json (chưa có lượt đồng bộ nào, hoặc trang không chạy trên GitHub Pages). Báo cáo thật vẫn có trong email. ",
+      bDemoBtn:"Xem giao diện với DỮ LIỆU MẪU", bDemo:"Đây là DỮ LIỆU MẪU để kiểm tra giao diện. Mọi nội dung có tiền tố [MẪU] đều không phải số liệu thật.",
+      bTimeout:"Chưa tải được dữ liệu sau 10 giây; số liệu đang hiển thị có thể chưa mới nhất.", bLost:"Kết nối dữ liệu bị ngắt ({c}). Tải lại trang để kết nối lại.",
+      bPlain:"Cảnh báo: data/runs.json chưa được mã hóa nên phân quyền không có hiệu lực.", bNoKeys:"Không đọc được keys.json – chưa thể đăng nhập.",
+      bEmptyRole:"Chưa có dữ liệu nào cho vai trò này trong lần đồng bộ gần nhất.",
+      lTitle:"Đăng nhập HOPT Hub", lSub:"Chọn vai trò được cấp và nhập mật khẩu. Mỗi vai trò chỉ mở được phần báo cáo được phân quyền.",
+      lRole:"Vai trò", lPw:"Mật khẩu", lBtn:"Đăng nhập", lBusy:"Đang giải mã…", lWrong:"Sai mật khẩu hoặc vai trò.", lNote:"Dữ liệu được mã hóa (RSA-OAEP + AES-256-GCM) và chỉ giải mã ngay trên thiết bị của bạn; mật khẩu không được gửi đi đâu.",
+      logout:"Đăng xuất", roleAdmin:"Quản trị", ownerView:"Chủ sở hữu (claude.ai)"},
+    en:{tagline:"Device radar · Finance · Investment & M&A · Strategy", kReported:"Agents reported today", kReportedS:"Mon–Fri, before 9:00 AM",
+      kEmail:"Emails delivered today", kEmailS:"to the Director's inbox", kAttach:"With PDF + infographic", kAttachS:"in today's emails",
+      kErr:"Failed runs, last 14 days", kErrS:"out of {n} runs", tToday:"Today", tWeek:"Weekly summary", tYear:"Annual review", tLog:"Operations log",
+      recoH:"Latest decision recommendations (Agent 4)", recoSubDef:"Synthesised from Agents 1–3 and policy research; evidence and sources are in Agent 4's email/PDF.",
+      recoSub:"From Agent 4's report of {d}. Evidence and sources are in Agent 4's email/PDF.", recoEmptyNone:"No recommendations yet. Agent 4 runs at 08:46 Mon–Fri, after Agents 1–3.",
+      recoEmptyRun:"Agent 4's latest run recorded no recommendations.", thNo:"#", thDecision:"Recommended decision", thConf:"Confidence", thNext7:"Next 7 days",
+      logH14:"Last 14 days", logRecent:"Recent runs", lgOk:"Succeeded", lgPart:"Email missing attachments", lgErr:"Failed", lgNone:"No run",
+      design:"Design", footNote:"For reference only · Data written by the HOPT Agents after each run",
+      stDone:"Done", stErr:"Failed", stWait:"Not run", stPart:"Missing attachments", stOld:"Previous – {d}", updated:"updated", openEmail:"Open report email ↗",
+      emailSent:"Email sent", emailNot:"Email not sent", attOk:"PDF + infographic", attNo:"No attachments", noHl:"This run recorded no key points.", note:"Note",
+      emptyToday:"No report yet today. Scheduled at {t}.", emptyWeekend:"No run scheduled today (Mon–Fri).",
+      emptyWeek:"No weekly report yet. First run: Saturday, 08:40.", emptyYear:"The annual report runs at 08:40 on 31 Dec: year in review, next-year scenarios and 5 strategic priorities.",
+      emptyLog:"No runs recorded yet.", thDate:"Date", thAgent:"Agent", thStatus:"Status", thEmail:"Email", thAtt:"Attachments", thDone:"Finished", thNote:"Note",
+      yes:"Yes", no:"No", sent:"Sent", notSent:"No", weekly:"Weekly summary", yearly:"Annual review", nextRun:"Next run", inMin:"in {m} min", inHM:"in {h} h {m} min",
+      connWait:"Connecting…", connLive:"Live data · {n} runs", connSync:"Syncing…", connRepo:"Live data from repo · {n} runs · updated {t}",
+      connNo:"No data yet", connDemo:"VIEWING SAMPLE DATA", connLocked:"Encrypted – sign in required",
+      bNoDb:"Could not read data/runs.json (no sync yet, or the page is not running on GitHub Pages). Full reports are still in your email. ",
+      bDemoBtn:"Preview with SAMPLE DATA", bDemo:"This is SAMPLE DATA for checking the layout. Anything prefixed [SAMPLE] is not real.",
+      bTimeout:"Data has not loaded after 10 seconds; figures shown may be out of date.", bLost:"Data connection lost ({c}). Reload the page to reconnect.",
+      bPlain:"Warning: data/runs.json is not encrypted, so access control has no effect.", bNoKeys:"Could not read keys.json – sign-in unavailable.",
+      bEmptyRole:"No data for this role in the latest sync.",
+      lTitle:"Sign in to HOPT Hub", lSub:"Choose your assigned role and enter its password. Each role unlocks only the reports it is granted.",
+      lRole:"Role", lPw:"Password", lBtn:"Sign in", lBusy:"Decrypting…", lWrong:"Wrong password or role.", lNote:"Data is encrypted (RSA-OAEP + AES-256-GCM) and decrypted only on your device; your password is never sent anywhere.",
+      logout:"Sign out", roleAdmin:"Administrator", ownerView:"Owner (claude.ai)"}
+  };
+  let LANG = "vi"; try { const s = localStorage.getItem("hopt.lang"); if (s === "vi" || s === "en") LANG = s; } catch(e){}
+  const t = (k, v={}) => String((I18N[LANG]||I18N.vi)[k] ?? I18N.vi[k] ?? k).replace(/\{(\w+)\}/g, (_,x) => v[x] ?? "");
+
+  const AGENTS = [
+    {code:"A1", n:1, vi:"Radar Thiết bị & Giải pháp Y tế số", en:"Device & Digital Health Radar", sVi:"Radar", sEn:"Radar", color:"#1D7874", h:8, m:35, days:[1,2,3,4,5]},
+    {code:"A2", n:2, vi:"Tài chính Quốc tế & Việt Nam", en:"Global & Vietnam Finance", sVi:"Tài chính", sEn:"Finance", color:"#0B3C5D", h:8, m:33, days:[1,2,3,4,5]},
+    {code:"A3", n:3, vi:"Đầu tư & M&A Bệnh viện, Phòng khám", en:"Hospital & Clinic Investment, M&A", sVi:"M&A", sEn:"M&A", color:"#6C8EAD", h:8, m:36, days:[1,2,3,4,5]},
+    {code:"A4", n:4, vi:"Thuận lợi, Bất lợi & Khuyến nghị chiến lược", en:"Opportunities, Risks & Strategy", sVi:"Chiến lược", sEn:"Strategy", color:"#E07A1F", h:8, m:46, days:[1,2,3,4,5]}
+  ];
+  const WEEKLY = {code:"W", vi:"Tổng hợp tuần – 4 Agent", en:"Weekly summary – 4 Agents", h:8, m:40, days:[6], schedVi:"08:40 · Thứ Bảy", schedEn:"08:40 · Saturday"};
+  const YEARLY = {code:"Y", vi:"Tổng kết năm & Triển vọng", en:"Annual review & Outlook", schedVi:"08:40 · 31/12", schedEn:"08:40 · 31 Dec"};
+  const nm = a => LANG==="en" ? a.en : a.vi;
+  const sh = a => LANG==="en" ? a.sEn : a.sVi;
+  const sched = a => a.schedVi ? (LANG==="en"?a.schedEn:a.schedVi) : `${String(a.h).padStart(2,"0")}:${String(a.m).padStart(2,"0")} · ${LANG==="en"?"Mon–Fri":"Thứ 2–6"}`;
+
+  const $ = s => document.querySelector(s);
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const str = (v, max=400) => (v == null ? "" : String(v)).slice(0, max);
+  const arr = v => Array.isArray(v) ? v : [];
+  const loc = (o, f) => (LANG==="en" && o && o[f+"_en"]) ? o[f+"_en"] : (o ? o[f] : undefined);
+  const locArr = (o, f) => (LANG==="en" && o && Array.isArray(o[f+"_en"]) && o[f+"_en"].length) ? o[f+"_en"] : arr(o && o[f]);
+
+  // ================= time (Asia/Bangkok, UTC+7) =================
+  const VN = 7*3600e3;
+  const vnNow = () => new Date(Date.now() + VN);
+  const ymd = d => d.toISOString().slice(0,10);
+  const todayVN = () => ymd(vnNow());
+  const fmtTime = iso => { const x = Date.parse(iso); if (isNaN(x)) return "—"; const s = new Date(x + VN).toISOString(); return s.slice(11,16) + " " + s.slice(8,10) + "/" + s.slice(5,7); };
+  const fmtDate = s => s && /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(8,10)+"/"+s.slice(5,7)+"/"+s.slice(0,4) : str(s,20);
+
+  // ================= state =================
+  let RUNS = [];               // decrypted, allowed runs only
+  let ROLE = null;             // "admin" | "user1".. | "owner"
+  let ALLOWED = new Set();     // agent groups this role may see
+  let KEYS = null, PRIV = null, MODE = "init"; // MODE: init|db|repo|demo|none
+
+  function nextRun(){
+    const now = vnNow(); let best = null;
+    const all = AGENTS.filter(a => ALLOWED.has(a.code)).map(a => ({...a, label:"Agent "+a.n})).concat(ALLOWED.has("W") ? [{...WEEKLY, label:t("weekly")}] : []);
+    for (let add=0; add<8 && !best && all.length; add++){
+      const d = new Date(now); d.setUTCDate(d.getUTCDate()+add);
+      const c = all.filter(a => a.days.includes(d.getUTCDay())).map(a => { const x = new Date(d); x.setUTCHours(a.h, a.m, 0, 0); return {a, x}; }).filter(o => o.x > now).sort((p,q)=>p.x-q.x);
+      if (c.length) best = c[0];
+    }
+    if (!best) return "—";
+    const mins = Math.round((best.x - now)/60000);
+    const when = mins < 60 ? t("inMin",{m:mins}) : mins < 1440 ? t("inHM",{h:Math.floor(mins/60),m:mins%60}) : best.x.toISOString().slice(8,10)+"/"+best.x.toISOString().slice(5,7);
+    return `${best.a.label} · ${String(best.a.h).padStart(2,"0")}:${String(best.a.m).padStart(2,"0")} (${when})`;
+  }
+  function tick(){ const s = vnNow().toISOString(); $("#clock").textContent = s.slice(11,16)+" · "+s.slice(8,10)+"/"+s.slice(5,7)+"/"+s.slice(0,4); $("#nextRun").textContent = t("nextRun")+": "+nextRun(); }
+
+  // ================= tabs (hash) =================
+  const VIEWS = ["today","week","year","log"];
+  function visibleViews(){ return VIEWS.filter(v => (v==="week" ? ALLOWED.has("W") : v==="year" ? ALLOWED.has("Y") : true)); }
+  function show(){
+    const vis = visibleViews();
+    document.querySelectorAll(".tab").forEach(tb => tb.style.display = vis.includes(tb.dataset.v) ? "" : "none");
+    const h = location.hash.slice(1); const v = vis.includes(h) ? h : "today";
+    document.querySelectorAll(".tab").forEach(tb => tb.setAttribute("aria-selected", tb.dataset.v === v));
+    document.querySelectorAll(".view").forEach(s => s.classList.toggle("on", s.id === "v-"+v));
+  }
+  document.querySelectorAll(".tab").forEach(tb => tb.addEventListener("click", () => { location.hash = tb.dataset.v; show(); }));
+  window.addEventListener("hashchange", show);
+
+  // ================= static texts / language =================
+  let conn = ["", "connWait", {}];
+  const setConn = (state, key, vars={}) => { conn = [state, key, vars]; $("#connDot").className = "dot " + state; $("#connTxt").textContent = t(key, vars); };
+  let bannerState = null;
+  function banner(key, vars, withDemo){ bannerState = key ? [key, vars, withDemo] : null; const b = $("#banner"); b.replaceChildren();
+    if (!key){ b.style.display = "none"; return; }
+    b.append(document.createTextNode(t(key, vars||{})));
+    if (withDemo){ const btn = el("button", null, t("bDemoBtn")); btn.style.cssText = "margin-left:6px;border:0;background:#0B3C5D;color:#fff;border-radius:8px;padding:6px 12px;font-weight:600;cursor:pointer"; btn.addEventListener("click", loadDemo); b.append(btn); }
+    b.style.display = "block"; }
+  function applyLang(){
+    document.documentElement.lang = LANG;
+    document.querySelectorAll("[data-i]").forEach(n => n.textContent = t(n.dataset.i));
+    document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === LANG));
+    setConn(conn[0], conn[1], conn[2]); if (bannerState) banner(...bannerState);
+    fillRoles(); userChip(); tick(); render();
+  }
+  document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => { LANG = b.dataset.lang; try{ localStorage.setItem("hopt.lang", LANG); }catch(e){} applyLang(); }));
+
+  // ================= rendering =================
+  const gmail = q => "https://mail.google.com/mail/u/0/#search/" + encodeURIComponent(q);
+  function status(run){
+    if (!run) return [t("stWait"),"p-wait"];
+    if (run.status === "error") return [t("stErr"),"p-err"];
+    if (run.emailSent && run.attachments === false) return [t("stPart"),"p-old"];
+    return [t("stDone"),"p-ok"];
+  }
+  function card(title, schedTxt, run, o){
+    const c = el("article","card"); const h = el("div","card-h");
+    const ic = el("div","ic", o.icon); ic.style.background = o.color; h.append(ic);
+    const tt = el("div"); tt.append(el("h3",null,title)); tt.append(el("div","meta", schedTxt + (run ? " · " + t("updated") + " " + fmtTime(run.finishedAt) : ""))); h.append(tt);
+    const [lbl, cls] = o.stale ? [t("stOld",{d:fmtDate(run.date)}),"p-old"] : status(run);
+    h.append(el("span","pill "+cls,lbl)); c.append(h);
+    if (!run) c.append(el("div","empty", o.emptyText));
+    else {
+      const k = arr(run.kpis).slice(0,4);
+      if (k.length){ const m = el("div","minis"); k.forEach(x => { const b = el("div","mini"); b.append(el("b",null,str(x && x.value,24))); b.append(el("span",null,str(loc(x,"label"),48))); b.title = str(loc(x,"note"),120); m.append(b); }); c.append(m); }
+      const hl = locArr(run,"highlights").slice(0, o.maxHl || 5);
+      if (hl.length){ const ul = el("ul","hl"); hl.forEach(x => ul.append(el("li",null,str(x,260)))); c.append(ul); }
+      else c.append(el("div","empty",t("noHl")));
+      if (run.status === "error" && run.note) c.append(el("div","empty", t("note")+": "+str(loc(run,"note"),120)));
+    }
+    const f = el("div","foot");
+    const a = el("a",null,t("openEmail")); a.href = gmail(o.query); a.target = "_blank"; a.rel = "noopener"; f.append(a);
+    if (run){
+      const e1 = el("span","flag"); e1.append(el("i", run.emailSent ? "g" : "r"), document.createTextNode(run.emailSent ? t("emailSent") : t("emailNot"))); f.append(e1);
+      const e2 = el("span","flag"); e2.append(el("i", run.attachments ? "g" : "r"), document.createTextNode(run.attachments ? t("attOk") : t("attNo"))); f.append(e2);
+    }
+    c.append(f); return c;
+  }
+  const latest = code => RUNS.find(r => r.agent === code) || null;
+  function table(head, rows){ const w = el("div","tw"); const tb = el("table"); const tr = el("tr"); head.forEach(x => tr.append(el("th",null,x))); tb.append(tr); rows.forEach(r => tb.append(r)); w.append(tb); return w; }
+
+  function render(){
+    const today = todayVN(), dow = vnNow().getUTCDay(), isWork = dow>=1 && dow<=5;
+    const mine = AGENTS.filter(a => ALLOWED.has(a.code));
+    // TODAY
+    const g = $("#todayGrid"); g.replaceChildren(); g.classList.toggle("one", mine.length === 1);
+    let rep=0, em=0, at=0;
+    mine.forEach(a => {
+      const last = latest(a.code), isT = last && last.date === today;
+      if (isT && last.status !== "error") rep++; if (isT && last.emailSent) em++; if (isT && last.attachments) at++;
+      g.append(card(nm(a), sched(a), last, {icon:"A"+a.n, color:a.color, stale: last && !isT, query:`subject:"[HOPT Agent ${a.n}]"`,
+        emptyText: isWork ? t("emptyToday",{t:String(a.h).padStart(2,"0")+":"+a.m}) : t("emptyWeekend")}));
+    });
+    const N = mine.length || 0;
+    $("#kReported").textContent = N ? rep+"/"+N : "–"; $("#kEmail").textContent = N ? em+"/"+N : "–"; $("#kAttach").textContent = N ? at+"/"+N : "–";
+    // RECOS (only roles with A4)
+    $("#recoSec").style.display = ALLOWED.has("A4") ? "" : "none";
+    const a4 = latest("A4"), box = $("#recoBox"); box.replaceChildren();
+    const recos = a4 ? arr(a4.recos).slice(0,5) : [];
+    if (!recos.length){ $("#recoSub").textContent = t("recoSubDef"); box.append(el("div","empty", a4 ? t("recoEmptyRun") : t("recoEmptyNone"))); }
+    else {
+      $("#recoSub").textContent = t("recoSub",{d:fmtDate(a4.date)});
+      box.append(table([t("thNo"),t("thDecision"),t("thConf"),t("thNext7")], recos.map((r,i) => { const tr = el("tr");
+        tr.append(el("td","mono",String(i+1))); tr.append(el("td",null,str(loc(r,"title"),240)));
+        const td = el("td"), cf = str(r && r.confidence,10), cfl = LANG==="en" ? ({"Cao":"High","Vừa":"Medium","Thấp":"Low"}[cf]||cf) : cf;
+        td.append(el("span","conf c-"+(["Cao","Vừa","Thấp"].includes(cf)?cf:"Thấp"), cfl || "—")); tr.append(td);
+        tr.append(el("td",null,str(loc(r,"next7"),240))); return tr; })));
+    }
+    // WEEK / YEAR
+    const wg = $("#weekGrid"); wg.replaceChildren(); const wk = RUNS.filter(r => r.agent === "W");
+    if (!wk.length) wg.append(card(nm(WEEKLY), sched(WEEKLY), null, {icon:"W", color:"#0F4C75", query:'subject:"[HOPT Tuần]"', emptyText:t("emptyWeek")}));
+    wk.slice(0,6).forEach((r,i) => wg.append(card(nm(WEEKLY) + (r.period ? " · " + str(loc(r,"period"),40) : ""), sched(WEEKLY), r, {icon:"W", color:"#0F4C75", query:'subject:"[HOPT Tuần]"', maxHl: i ? 3 : 6})));
+    const yg = $("#yearGrid"); yg.replaceChildren(); const yr = RUNS.filter(r => r.agent === "Y");
+    if (!yr.length) yg.append(card(nm(YEARLY), sched(YEARLY), null, {icon:"Y", color:"#1D7874", query:'subject:"[HOPT Năm]"', emptyText:t("emptyYear")}));
+    yr.slice(0,4).forEach(r => yg.append(card(nm(YEARLY) + (r.period ? " · " + str(loc(r,"period"),40) : ""), sched(YEARLY), r, {icon:"Y", color:"#1D7874", query:'subject:"[HOPT Năm]"', maxHl:8})));
+    // LOG
+    const days = []; for (let i=13;i>=0;i--){ const d = vnNow(); d.setUTCDate(d.getUTCDate()-i); days.push(ymd(d)); }
+    const hm = $("#heat"); hm.replaceChildren(); hm.style.gridTemplateColumns = "auto repeat(14, minmax(28px,1fr))";
+    hm.append(el("div","lab","")); days.forEach(d => hm.append(el("div","d", d.slice(8,10)+"/"+d.slice(5,7))));
+    let errs = 0, tot = 0;
+    mine.forEach(a => { hm.append(el("div","lab","Agent "+a.n+" · "+sh(a)));
+      days.forEach(d => { const r = RUNS.find(x => x.agent === a.code && x.date === d), c = el("div","cell");
+        if (r){ tot++; if (r.status==="error"){ c.classList.add("err"); errs++; } else if (!r.attachments) c.classList.add("part"); else c.classList.add("ok"); c.title = `${sh(a)} ${fmtDate(d)}: ${status(r)[0]}`; }
+        else c.title = `${sh(a)} ${fmtDate(d)}: ${t("lgNone")}`; hm.append(c); }); });
+    $("#kErr").textContent = N ? String(errs) : "–"; $("#kErrS").textContent = t("kErrS",{n:tot});
+    const lt = $("#logTable"); lt.replaceChildren();
+    if (!RUNS.length){ lt.append(el("div","empty",t("emptyLog"))); return; }
+    lt.append(table([t("thDate"),t("thAgent"),t("thStatus"),t("thEmail"),t("thAtt"),t("thDone"),t("thNote")], RUNS.slice(0,40).map(r => { const tr = el("tr"), ag = AGENTS.find(a => a.code===r.agent);
+      tr.append(el("td","mono",fmtDate(r.date))); tr.append(el("td",null, ag ? "Agent "+ag.n+" · "+sh(ag) : r.agent==="W" ? t("weekly") : r.agent==="Y" ? t("yearly") : str(r.agent,12)));
+      const td = el("td"), [l,c] = status(r), p = el("span","pill "+c,l); p.style.marginLeft = "0"; td.append(p); tr.append(td);
+      tr.append(el("td",null, r.emailSent ? t("sent") : t("notSent"))); tr.append(el("td",null, r.attachments ? t("yes") : t("no")));
+      tr.append(el("td","mono",fmtTime(r.finishedAt))); tr.append(el("td",null,str(loc(r,"note"),90))); return tr; })));
+  }
+
+  // ================= crypto (WebCrypto) =================
+  const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  async function openPrivate(role, password){
+    const e = KEYS.roles[role].encPriv;
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+    const aes = await crypto.subtle.deriveKey({name:"PBKDF2", salt:ub64(e.salt), iterations:e.iter, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+    const pkcs8 = await crypto.subtle.decrypt({name:"AES-GCM", iv:ub64(e.iv)}, aes, ub64(e.ct));
+    return crypto.subtle.importKey("pkcs8", pkcs8, {name:"RSA-OAEP", hash:"SHA-256"}, false, ["decrypt"]);
+  }
+  async function decryptAll(doc){
+    const out = [];
+    for (const [g, b] of Object.entries((doc && doc.bundles) || {})){
+      const wrapped = b.keys && b.keys[ROLE]; if (!wrapped) continue;
+      try {
+        const raw = await crypto.subtle.decrypt({name:"RSA-OAEP"}, PRIV, ub64(wrapped));
+        const k = await crypto.subtle.importKey("raw", raw, {name:"AES-GCM"}, false, ["decrypt"]);
+        const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:ub64(b.iv), additionalData:new TextEncoder().encode(g)}, k, ub64(b.ct));
+        arr(JSON.parse(new TextDecoder().decode(pt)).runs).forEach(r => { if (r && r.agent === g) out.push(r); });
+      } catch(e){ /* bundle not readable by this role */ }
+    }
+    return out.sort((x,y) => String(y.finishedAt||"").localeCompare(String(x.finishedAt||"")));
+  }
+
+  // ================= login =================
+  function fillRoles(){
+    const s = $("#lRole"); if (!KEYS) return; const cur = s.value; s.replaceChildren();
+    Object.entries(KEYS.roles).forEach(([r, e]) => { const o = el("option", null, `${r} — ${LANG==="en" ? (e.label_en||e.label_vi||"") : (e.label_vi||"")}`); o.value = r; s.append(o); });
+    if (cur) s.value = cur;
+  }
+  function userChip(){
+    const c = $("#userChip"); if (!ROLE){ c.style.display = "none"; return; }
+    c.style.display = ""; c.replaceChildren();
+    const label = ROLE === "owner" ? t("ownerView") : ROLE === "admin" ? `admin · ${t("roleAdmin")}` : `${ROLE} · ${KEYS && KEYS.roles[ROLE] ? (LANG==="en" ? KEYS.roles[ROLE].label_en : KEYS.roles[ROLE].label_vi) : ""}`;
+    c.append(document.createTextNode("👤 " + label + (MODE === "repo" ? " · " + t("logout") : "")));
+    c.disabled = MODE !== "repo";
+  }
+  $("#userChip").addEventListener("click", () => { if (MODE !== "repo") return; PRIV = null; ROLE = null; ALLOWED = new Set(); RUNS = []; userChip(); render(); show(); setConn("warn","connLocked"); $("#lPw").value = ""; $("#login").classList.add("on"); $("#lPw").focus(); });
+  $("#lform").addEventListener("submit", async ev => {
+    ev.preventDefault(); const btn = $("#lBtn"), err = $("#lErr"); err.textContent = ""; btn.disabled = true; btn.textContent = t("lBusy");
+    const role = $("#lRole").value, pw = $("#lPw").value;
+    try {
+      PRIV = await openPrivate(role, pw); ROLE = role; ALLOWED = new Set(arr(KEYS.access && KEYS.access[role]));
+      $("#lPw").value = ""; $("#login").classList.remove("on");
+      await refreshRepo(); setInterval(refreshRepo, 5*60*1000);
+    } catch(e){ PRIV = null; err.textContent = t("lWrong"); }
+    btn.disabled = false; btn.textContent = t("lBtn");
+  });
+
+  // ================= data sources =================
+  let lastDoc = null;
+  async function fetchJson(path){ const r = await fetch(path + "?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) throw new Error(r.status); return r.json(); }
+  async function refreshRepo(){
+    if (!PRIV) return;
+    try { lastDoc = await fetchJson("data/runs.json"); } catch(e){ if (!lastDoc) { banner("bNoDb"); return; } }
+    RUNS = await decryptAll(lastDoc);
+    setConn("live","connRepo",{n:RUNS.length, t:fmtTime(lastDoc.updatedAt)});
+    banner(RUNS.length ? null : "bEmptyRole"); userChip(); show(); render();
+  }
+  async function startRepo(){
+    let doc = null;
+    try { doc = await fetchJson("data/runs.json"); } catch(e){}
+    if (doc && !doc.encrypted && arr(doc.runs).length){   // legacy plaintext file
+      MODE = "repo"; ROLE = "admin"; ALLOWED = new Set(["A1","A2","A3","A4","W","Y"]);
+      RUNS = arr(doc.runs).filter(r => r && typeof r.agent === "string").sort((x,y) => String(y.finishedAt||"").localeCompare(String(x.finishedAt||"")));
+      setConn("warn","connRepo",{n:RUNS.length,t:fmtTime(doc.updatedAt)}); banner("bPlain"); userChip(); show(); render(); return;
+    }
+    try { KEYS = await fetchJson("keys.json"); } catch(e){ KEYS = null; }
+    if (!KEYS || !KEYS.roles){ MODE = "none"; setConn("warn","connNo"); banner(doc ? "bNoKeys" : "bNoDb", null, true); return; }
+    MODE = "repo"; lastDoc = doc; fillRoles(); setConn("warn","connLocked");
+    if (!doc) banner("bNoDb");
+    $("#login").classList.add("on"); setTimeout(() => $("#lPw").focus(), 50);
+  }
+  function loadDemo(){
+    const d = i => { const x = vnNow(); x.setUTCDate(x.getUTCDate()-i); return ymd(x); };
+    const iso = (i,h,m) => new Date(Date.parse(d(i)+"T00:00:00Z") + ((h-7)*60+m)*60000).toISOString();
+    const P = LANG==="en" ? "[SAMPLE] " : "[MẪU] ";
+    const runs = [];
+    for (let i=0;i<10;i++){ const w = new Date(Date.parse(d(i))).getUTCDay(); if (w===0||w===6) continue;
+      AGENTS.forEach((a,k) => runs.push({agent:a.code, date:d(i), status:(i===2&&k===1)?"error":"ok", finishedAt:iso(i,8,40+k*4),
+        emailSent:!(i===2&&k===1), attachments:!(i===2&&k===1)&&!(i===4&&k===3), highlights:[P+"1 · "+sh(a), P+"2", P+"3"],
+        kpis:[{label:"A",value:String(3+k)},{label:"B",value:String(1+i%3)},{label:"C",value:"–"},{label:"D",value:"0"}],
+        recos: a.code==="A4" ? [{title:P+"1",confidence:"Cao",next7:P+"…"},{title:P+"2",confidence:"Vừa",next7:P+"…"},{title:P+"3",confidence:"Thấp",next7:P+"…"}] : undefined,
+        note:(i===2&&k===1) ? P+"error" : ""})); }
+    runs.push({agent:"W", date:d(4), period:"—", status:"ok", finishedAt:iso(4,8,52), emailSent:true, attachments:true, highlights:[P+"W"], kpis:[{label:"W",value:"12"}]});
+    MODE = "demo"; ROLE = "admin"; ALLOWED = new Set(["A1","A2","A3","A4","W","Y"]);
+    RUNS = runs.sort((x,y) => String(y.finishedAt).localeCompare(String(x.finishedAt)));
+    setConn("warn","connDemo"); banner("bDemo"); userChip(); show(); render();
+  }
+
+  // ================= boot =================
+  applyLang(); show(); setInterval(tick, 30000); setInterval(render, 60000);
+  (async () => {
+    let db = null;
+    try { db = await (window.claude && window.claude.use ? window.claude.use("db") : null); } catch(e){ db = null; }
+    if (!db){ await startRepo(); return; }
+    // claude.ai: only the owner can open this artifact -> full view, data straight from the Hub store
+    MODE = "db"; ROLE = "owner"; ALLOWED = new Set(["A1","A2","A3","A4","W","Y"]); userChip(); show();
+    const timer = setTimeout(() => { setConn("warn","connWait"); banner("bTimeout"); }, 10000);
+    db.collection("runs").orderBy("finishedAt","desc").limit(300).onSnapshot(snap => {
+      if (!snap.metadata.fromCache){ clearTimeout(timer); banner(null); }
+      RUNS = snap.docs.map(d => ({id:d.id, ...(d.data()||{})})).filter(r => r && typeof r.agent === "string");
+      setConn("live", snap.metadata.fromCache ? "connSync" : "connLive", {n:RUNS.length}); render();
+    }, err => { clearTimeout(timer); setConn("warn","connNo"); banner("bLost",{c:(err && err.code) || "error"}); });
+  })();
+})();
+</script>
+</body>
+</html>
