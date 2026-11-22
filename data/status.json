@@ -1,8 +1,8 @@
 {
  "version": 1,
  "source": "HOPT Intelligence Hub",
- "updatedAt": "2026-11-22T09:39:32Z",
- "latestFinishedAt": "2026-11-22T09:08:40Z",
+ "updatedAt": "2026-11-22T14:14:00Z",
+ "latestFinishedAt": "2026-11-22T09:12:00Z",
  "total": 9,
  "groups": {
   "A1": {
@@ -26,7 +26,7 @@
   "A4": {
    "count": 1,
    "lastDate": "2026-11-22",
-   "lastFinishedAt": "2026-11-22T09:08:40Z",
+   "lastFinishedAt": "2026-11-22T09:12:00Z",
    "lastStatus": "ok"
   },
   "W": {
