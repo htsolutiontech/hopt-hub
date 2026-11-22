@@ -56,8 +56,18 @@ main{max-width:1240px;margin:-44px auto 0;padding:0 20px 40px}
 .hl{margin:0;padding-left:18px}.hl li{margin:3px 0}
 .empty{color:var(--mute);font-size:13px;background:#F8FAFC;border:1px dashed var(--line);border-radius:10px;padding:12px}
 .foot{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;border-top:1px solid var(--line);padding-top:10px;margin-top:auto;color:var(--mute)}
-.flag{display:inline-flex;gap:5px;align-items:center}
-.flag i{width:7px;height:7px;border-radius:50%;display:inline-block;background:#CBD5E1}.flag i.g{background:var(--green)}.flag i.r{background:var(--red)}
+.full{border-top:1px solid var(--line);padding-top:8px}
+.full>summary,.prev>summary{cursor:pointer;color:var(--navy-2);font-weight:600;padding:4px 0;list-style-position:inside}
+.full h4{margin:14px 0 6px;color:var(--teal);font-size:14px}
+.full .body{overflow-x:auto}.full .body table{min-width:0;font-size:12.5px;margin:6px 0;box-shadow:none;border:1px solid var(--line)}
+.full .body p{margin:6px 0}.full .body ul,.full .body ol{margin:6px 0;padding-left:20px}
+.src{margin:6px 0;padding-left:20px;font-size:12.5px}.src li{margin:3px 0;word-break:break-word}.src .lb{color:var(--orange);font-size:11.5px;margin-left:4px}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.chart{border:1px solid var(--line);border-radius:10px;padding:10px 12px}.chart h5{margin:0 0 6px;font-size:12.5px;color:var(--navy)}
+.chart .cs{font-size:11px;color:var(--mute);margin-top:4px}
+.bar{display:grid;grid-template-columns:minmax(80px,40%) 1fr auto;gap:8px;align-items:center;font-size:11.5px;margin:3px 0}
+.bar .bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}.bar .bt{height:10px;border-radius:5px;background:#EEF2F6;overflow:hidden}.bar .bt i{display:block;height:100%;background:var(--teal)}.bar .bv{font-family:"JetBrains Mono",monospace;color:var(--navy)}
+.prev{border-top:1px solid var(--line);padding-top:8px;font-size:13px}.prev details{margin:4px 0 4px 8px}.prev details>summary{cursor:pointer;color:var(--mute)}
 .sec{margin-top:22px}.sec h2{font-size:16px;margin:0 0 10px;color:var(--navy)}.sec .sub{color:var(--mute);font-size:12.5px;margin:-6px 0 12px}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;box-shadow:var(--shadow)}
 table{width:100%;border-collapse:collapse;background:var(--card);font-size:13px;min-width:560px}
@@ -143,7 +153,7 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
   <section class="view" id="v-log">
     <div class="sec" style="margin-top:0"><h2 data-i="logH14"></h2>
       <div class="heat"><div class="hm" id="heat"></div>
-        <div class="legend"><span><i style="background:var(--teal)"></i><b data-i="lgOk" style="font-weight:400"></b></span><span><i style="background:var(--orange)"></i><b data-i="lgPart" style="font-weight:400"></b></span><span><i style="background:var(--red)"></i><b data-i="lgErr" style="font-weight:400"></b></span><span><i style="background:#EEF2F6"></i><b data-i="lgNone" style="font-weight:400"></b></span></div>
+        <div class="legend"><span><i style="background:var(--teal)"></i><b data-i="lgOk" style="font-weight:400"></b></span><span><i style="background:var(--red)"></i><b data-i="lgErr" style="font-weight:400"></b></span><span><i style="background:#EEF2F6"></i><b data-i="lgNone" style="font-weight:400"></b></span></div>
       </div></div>
     <div class="sec"><h2 data-i="logRecent"></h2><div id="logTable"></div></div>
   </section>
@@ -174,10 +184,10 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
   // ================= i18n =================
   const I18N = {
     vi:{tagline:"Radar thiết bị · Tài chính · Đầu tư & M&A · Chiến lược", kReported:"Agent đã báo cáo hôm nay", kReportedS:"Thứ Hai–Thứ Sáu, trước 9h00",
-      kEmail:"Email gửi thành công hôm nay", kEmailS:"tới hộp thư Giám đốc", kAttach:"Có đủ PDF + infographic", kAttachS:"trong các email hôm nay",
+      kEmail:"Điểm chính hôm nay", kEmailS:"tổng của các agent", kAttach:"Nguồn trích dẫn hôm nay", kAttachS:"đã kiểm chứng, có nhãn độ tin cậy", full:"Báo cáo đầy đủ", sources:"Nguồn", prev:"Các bản trước", chSrc:"Nguồn",
       kErr:"Lượt lỗi 14 ngày qua", kErrS:"trên {n} lượt chạy", tToday:"Hôm nay", tWeek:"Tổng hợp tuần", tYear:"Tổng kết năm", tLog:"Nhật ký vận hành",
-      recoH:"Khuyến nghị quyết định mới nhất (Agent 4)", recoSubDef:"Tổng hợp từ Agent 1–3 và tra cứu chính sách; chi tiết và bằng chứng trong email/PDF của Agent 4.",
-      recoSub:"Theo báo cáo Agent 4 ngày {d}. Chi tiết, bằng chứng và nguồn trong email/PDF của Agent 4.", recoEmptyNone:"Chưa có khuyến nghị. Agent 4 chạy lúc 08:46 các ngày Thứ 2–6, sau Agent 1–3.",
+      recoH:"Khuyến nghị quyết định mới nhất (Agent 4)", recoSubDef:"Tổng hợp từ Agent 1–3 và tra cứu chính sách; chi tiết và bằng chứng trong báo cáo đầy đủ của Agent 4 ở trên.",
+      recoSub:"Theo báo cáo Agent 4 ngày {d}. Chi tiết, bằng chứng và nguồn trong báo cáo đầy đủ của Agent 4 ở trên.", recoEmptyNone:"Chưa có khuyến nghị. Agent 4 chạy lúc 08:46 các ngày Thứ 2–6, sau Agent 1–3.",
       recoEmptyRun:"Lượt gần nhất của Agent 4 chưa ghi khuyến nghị.", thNo:"#", thDecision:"Quyết định đề xuất", thConf:"Mức tin cậy", thNext7:"Việc trong 7 ngày",
       logH14:"14 ngày gần nhất", logRecent:"Lượt chạy gần đây", lgOk:"Thành công", lgPart:"Email thiếu đính kèm", lgErr:"Lỗi", lgNone:"Không có lượt chạy",
       design:"Thiết kế", footNote:"Thông tin chỉ mang tính gợi ý tham khảo · Dữ liệu do các HOPT Agent ghi sau mỗi lượt chạy",
@@ -185,24 +195,24 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
       emailSent:"Email đã gửi", emailNot:"Email chưa gửi", attOk:"PDF + infographic", attNo:"Không có đính kèm", noHl:"Lượt chạy chưa ghi điểm chính.", note:"Ghi chú",
       emptyToday:"Chưa có báo cáo hôm nay. Lượt chạy lúc {t}.", emptyWeekend:"Hôm nay không có lịch chạy (Thứ 2–6).",
       emptyWeek:"Chưa có báo cáo tuần. Lượt đầu tiên: Thứ Bảy, 08:40.", emptyYear:"Báo cáo năm chạy lúc 08:40 ngày 31/12, gồm tổng kết năm, các kịch bản năm tới và 5 ưu tiên chiến lược.",
-      emptyLog:"Chưa có lượt chạy nào được ghi.", thDate:"Ngày", thAgent:"Agent", thStatus:"Trạng thái", thEmail:"Email", thAtt:"Đính kèm", thDone:"Hoàn tất lúc", thNote:"Ghi chú",
+      emptyLog:"Chưa có lượt chạy nào được ghi.", thDate:"Ngày", thAgent:"Agent", thStatus:"Trạng thái", thDone:"Hoàn tất lúc", thNote:"Ghi chú",
       yes:"Có", no:"Không", sent:"Đã gửi", notSent:"Chưa", weekly:"Tổng hợp tuần", yearly:"Tổng kết năm", nextRun:"Lượt kế tiếp", inMin:"sau {m} phút", inHM:"sau {h} giờ {m} phút",
       connWait:"Đang kết nối dữ liệu…", connLive:"Dữ liệu trực tiếp · {n} lượt", connSync:"Đang đồng bộ…", connRepo:"Dữ liệu thật từ repo · {n} lượt · cập nhật {t}",
       connNo:"Chưa có dữ liệu", connDemo:"ĐANG XEM DỮ LIỆU MẪU", connLocked:"Đã mã hóa – cần đăng nhập",
-      bNoDb:"Không đọc được data/runs.json (chưa có lượt đồng bộ nào, hoặc trang không chạy trên GitHub Pages). Báo cáo thật vẫn có trong email. ",
+      bNoDb:"Không đọc được data/runs.json (chưa có lượt đồng bộ nào, hoặc trang không chạy trên GitHub Pages). ",
       bDemoBtn:"Xem giao diện với DỮ LIỆU MẪU", bDemo:"Đây là DỮ LIỆU MẪU để kiểm tra giao diện. Mọi nội dung có tiền tố [MẪU] đều không phải số liệu thật.",
       bTimeout:"Chưa tải được dữ liệu sau 10 giây; số liệu đang hiển thị có thể chưa mới nhất.", bLost:"Kết nối dữ liệu bị ngắt ({c}). Tải lại trang để kết nối lại.",
       bPlain:"Cảnh báo: data/runs.json chưa được mã hóa nên phân quyền không có hiệu lực.", bNoKeys:"Không đọc được keys.json – chưa thể đăng nhập.",
       bEmptyRole:"Chưa có dữ liệu nào cho vai trò này trong lần đồng bộ gần nhất.",
-      stale:"Dữ liệu trên site đang dừng ở lượt chạy {t} (đồng bộ lần cuối {u}). Lượt dự kiến gần nhất là {e} nhưng chưa được đồng bộ – báo cáo đầy đủ vẫn có trong email.", staleNo:"Chưa có thông tin đồng bộ (data/status.json).",
+      stale:"Dữ liệu trên site đang dừng ở lượt chạy {t} (đồng bộ lần cuối {u}). Lượt dự kiến gần nhất là {e} nhưng chưa được đồng bộ.", staleNo:"Chưa có thông tin đồng bộ (data/status.json).",
       lTitle:"Đăng nhập HOPT Hub", lSub:"Chọn vai trò được cấp và nhập mật khẩu. Mỗi vai trò chỉ mở được phần báo cáo được phân quyền.",
       lRole:"Vai trò", lPw:"Mật khẩu", lBtn:"Đăng nhập", lBusy:"Đang giải mã…", lWrong:"Sai mật khẩu hoặc vai trò.", lNote:"Dữ liệu được mã hóa (RSA-OAEP + AES-256-GCM) và chỉ giải mã ngay trên thiết bị của bạn; mật khẩu không được gửi đi đâu.",
       logout:"Đăng xuất", roleAdmin:"Quản trị", ownerView:"Chủ sở hữu (claude.ai)"},
     en:{tagline:"Device radar · Finance · Investment & M&A · Strategy", kReported:"Agents reported today", kReportedS:"Mon–Fri, before 9:00 AM",
-      kEmail:"Emails delivered today", kEmailS:"to the Director's inbox", kAttach:"With PDF + infographic", kAttachS:"in today's emails",
+      kEmail:"Key points today", kEmailS:"across agents", kAttach:"Sources cited today", kAttachS:"verified, with reliability labels", full:"Full report (Vietnamese)", sources:"Sources", prev:"Earlier reports", chSrc:"Source",
       kErr:"Failed runs, last 14 days", kErrS:"out of {n} runs", tToday:"Today", tWeek:"Weekly summary", tYear:"Annual review", tLog:"Operations log",
-      recoH:"Latest decision recommendations (Agent 4)", recoSubDef:"Synthesised from Agents 1–3 and policy research; evidence and sources are in Agent 4's email/PDF.",
-      recoSub:"From Agent 4's report of {d}. Evidence and sources are in Agent 4's email/PDF.", recoEmptyNone:"No recommendations yet. Agent 4 runs at 08:46 Mon–Fri, after Agents 1–3.",
+      recoH:"Latest decision recommendations (Agent 4)", recoSubDef:"Synthesised from Agents 1–3 and policy research; evidence and sources are in Agent 4's full report above.",
+      recoSub:"From Agent 4's report of {d}. Evidence and sources are in Agent 4's full report above.", recoEmptyNone:"No recommendations yet. Agent 4 runs at 08:46 Mon–Fri, after Agents 1–3.",
       recoEmptyRun:"Agent 4's latest run recorded no recommendations.", thNo:"#", thDecision:"Recommended decision", thConf:"Confidence", thNext7:"Next 7 days",
       logH14:"Last 14 days", logRecent:"Recent runs", lgOk:"Succeeded", lgPart:"Email missing attachments", lgErr:"Failed", lgNone:"No run",
       design:"Design", footNote:"For reference only · Data written by the HOPT Agents after each run",
@@ -210,16 +220,16 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
       emailSent:"Email sent", emailNot:"Email not sent", attOk:"PDF + infographic", attNo:"No attachments", noHl:"This run recorded no key points.", note:"Note",
       emptyToday:"No report yet today. Scheduled at {t}.", emptyWeekend:"No run scheduled today (Mon–Fri).",
       emptyWeek:"No weekly report yet. First run: Saturday, 08:40.", emptyYear:"The annual report runs at 08:40 on 31 Dec: year in review, next-year scenarios and 5 strategic priorities.",
-      emptyLog:"No runs recorded yet.", thDate:"Date", thAgent:"Agent", thStatus:"Status", thEmail:"Email", thAtt:"Attachments", thDone:"Finished", thNote:"Note",
+      emptyLog:"No runs recorded yet.", thDate:"Date", thAgent:"Agent", thStatus:"Status", thDone:"Finished", thNote:"Note",
       yes:"Yes", no:"No", sent:"Sent", notSent:"No", weekly:"Weekly summary", yearly:"Annual review", nextRun:"Next run", inMin:"in {m} min", inHM:"in {h} h {m} min",
       connWait:"Connecting…", connLive:"Live data · {n} runs", connSync:"Syncing…", connRepo:"Live data from repo · {n} runs · updated {t}",
       connNo:"No data yet", connDemo:"VIEWING SAMPLE DATA", connLocked:"Encrypted – sign in required",
-      bNoDb:"Could not read data/runs.json (no sync yet, or the page is not running on GitHub Pages). Full reports are still in your email. ",
+      bNoDb:"Could not read data/runs.json (no sync yet, or the page is not running on GitHub Pages). ",
       bDemoBtn:"Preview with SAMPLE DATA", bDemo:"This is SAMPLE DATA for checking the layout. Anything prefixed [SAMPLE] is not real.",
       bTimeout:"Data has not loaded after 10 seconds; figures shown may be out of date.", bLost:"Data connection lost ({c}). Reload the page to reconnect.",
       bPlain:"Warning: data/runs.json is not encrypted, so access control has no effect.", bNoKeys:"Could not read keys.json – sign-in unavailable.",
       bEmptyRole:"No data for this role in the latest sync.",
-      stale:"Site data stops at the run of {t} (last sync {u}). The latest expected run ({e}) has not been synced yet – full reports are still in your email.", staleNo:"No sync information yet (data/status.json).",
+      stale:"Site data stops at the run of {t} (last sync {u}). The latest expected run ({e}) has not been synced yet.", staleNo:"No sync information yet (data/status.json).",
       lTitle:"Sign in to HOPT Hub", lSub:"Choose your assigned role and enter its password. Each role unlocks only the reports it is granted.",
       lRole:"Role", lPw:"Password", lBtn:"Sign in", lBusy:"Decrypting…", lWrong:"Wrong password or role.", lNote:"Data is encrypted (RSA-OAEP + AES-256-GCM) and decrypted only on your device; your password is never sent anywhere.",
       logout:"Sign out", roleAdmin:"Administrator", ownerView:"Owner (claude.ai)"}
@@ -307,11 +317,9 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
   document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => { LANG = b.dataset.lang; try{ localStorage.setItem("hopt.lang", LANG); }catch(e){} applyLang(); }));
 
   // ================= rendering =================
-  const gmail = q => "https://mail.google.com/mail/u/0/#search/" + encodeURIComponent(q);
   function status(run){
     if (!run) return [t("stWait"),"p-wait"];
     if (run.status === "error") return [t("stErr"),"p-err"];
-    if (run.emailSent && run.attachments === false) return [t("stPart"),"p-old"];
     return [t("stDone"),"p-ok"];
   }
   function card(title, schedTxt, run, o){
@@ -328,14 +336,49 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
       if (hl.length){ const ul = el("ul","hl"); hl.forEach(x => ul.append(el("li",null,str(x,260)))); c.append(ul); }
       else c.append(el("div","empty",t("noHl")));
       if (run.status === "error" && run.note) c.append(el("div","empty", t("note")+": "+str(loc(run,"note"),120)));
+      full(c, run, o.open);
+      if (o.prev && o.prev.length){ const pv = el("details","prev"); pv.append(el("summary",null,t("prev")+" ("+o.prev.length+")"));
+        o.prev.forEach(r => { const d = el("details"); d.append(el("summary",null,fmtDate(r.date)+(r.period ? " · "+str(loc(r,"period"),40) : "")));
+          const hl2 = locArr(r,"highlights"); if (hl2.length){ const ul = el("ul","hl"); hl2.forEach(x => ul.append(el("li",null,str(x,260)))); d.append(ul); }
+          full(d, r, false); pv.append(d); });
+        c.append(pv); }
     }
-    const f = el("div","foot");
-    const a = el("a",null,t("openEmail")); a.href = gmail(o.query); a.target = "_blank"; a.rel = "noopener"; f.append(a);
-    if (run){
-      const e1 = el("span","flag"); e1.append(el("i", run.emailSent ? "g" : "r"), document.createTextNode(run.emailSent ? t("emailSent") : t("emailNot"))); f.append(e1);
-      const e2 = el("span","flag"); e2.append(el("i", run.attachments ? "g" : "r"), document.createTextNode(run.attachments ? t("attOk") : t("attNo"))); f.append(e2);
-    }
-    c.append(f); return c;
+    return c;
+  }
+  // ---- báo cáo đầy đủ: biểu đồ + các mục HTML (đã lọc) + nguồn ----
+  const OK_TAGS = new Set(["P","UL","OL","LI","TABLE","THEAD","TBODY","TR","TH","TD","B","STRONG","I","EM","A","BR","SPAN","DIV","H3","H4","H5","SMALL","SUP","SUB","CODE","BLOCKQUOTE"]);
+  function safeNode(n){
+    if (n.nodeType === 3) return document.createTextNode(n.nodeValue);
+    if (n.nodeType !== 1) return null;
+    const tag = n.tagName.toUpperCase();
+    if (["SCRIPT","STYLE","IFRAME","OBJECT","EMBED","IMG","SVG","FORM","INPUT","LINK","META"].includes(tag)) return null;
+    const out = OK_TAGS.has(tag) ? document.createElement(tag.toLowerCase()) : document.createDocumentFragment();
+    if (tag === "A"){ const h = n.getAttribute("href") || ""; if (/^https?:/i.test(h) && !/claude\.ai/i.test(h)){ out.href = h; out.target = "_blank"; out.rel = "noopener"; } }
+    if ((tag === "TD" || tag === "TH") && n.getAttribute("colspan")) out.setAttribute("colspan", String(parseInt(n.getAttribute("colspan"),10)||1));
+    n.childNodes.forEach(ch => { const x = safeNode(ch); if (x) out.append(x); });
+    return out;
+  }
+  function safeHTML(html){ const box = el("div","body"); const doc = new DOMParser().parseFromString("<div>"+String(html||"")+"</div>","text/html");
+    doc.body.firstChild.childNodes.forEach(ch => { const x = safeNode(ch); if (x) box.append(x); }); return box; }
+  function chart(ch){
+    const L = arr(ch && ch.labels), V = arr(ch && ch.values).map(Number);
+    if (L.length < 3 || L.length !== V.length || V.some(v => !isFinite(v))) return null;
+    const w = el("div","chart"); w.append(el("h5",null,str(loc(ch,"title"),90)+(ch.unit ? " ("+str(ch.unit,16)+")" : "")));
+    const mx = Math.max(...V.map(Math.abs)) || 1;
+    L.forEach((l,i) => { const r = el("div","bar"); r.append(el("span","bl",str(l,60))); const bt = el("span","bt"), bi = el("i"); bi.style.width = (Math.abs(V[i])/mx*100).toFixed(1)+"%"; if (V[i] < 0) bi.style.background = "var(--orange)"; bt.append(bi); r.append(bt); r.append(el("span","bv",String(V[i]))); r.title = l+": "+V[i]; w.append(r); });
+    if (ch.source) w.append(el("div","cs",t("chSrc")+": "+str(ch.source,160)));
+    return w;
+  }
+  function full(c, run, open){
+    const charts = arr(run.charts).map(chart).filter(Boolean);
+    if (charts.length){ const g = el("div","charts"); charts.forEach(x => g.append(x)); c.append(g); }
+    const secs = arr(run.sections).filter(x => x && x.html);
+    if (secs.length){ const d = el("details","full"); if (open) d.open = true; d.append(el("summary",null,t("full")));
+      secs.forEach(x => { d.append(el("h4",null,str(x.title,140))); d.append(safeHTML(x.html)); }); c.append(d); }
+    const src = arr(run.sources).filter(x => x && /^https?:/i.test(x.url||"") && !/claude\.ai/i.test(x.url));
+    if (src.length){ const d = el("details","full"); d.append(el("summary",null,t("sources")+" ("+src.length+")")); const ol = el("ol","src");
+      src.forEach(x => { const li = el("li"), a = el("a",null,str(x.title || x.url,160)); a.href = x.url; a.target = "_blank"; a.rel = "noopener"; li.append(a); if (x.label) li.append(el("span","lb",str(x.label,40))); ol.append(li); });
+      d.append(ol); c.append(d); }
   }
   const latest = code => RUNS.find(r => r.agent === code) || null;
   function table(head, rows){ const w = el("div","tw"); const tb = el("table"); const tr = el("tr"); head.forEach(x => tr.append(el("th",null,x))); tb.append(tr); rows.forEach(r => tb.append(r)); w.append(tb); return w; }
@@ -348,12 +391,12 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     let rep=0, em=0, at=0;
     mine.forEach(a => {
       const last = latest(a.code), isT = last && last.date === today;
-      if (isT && last.status !== "error") rep++; if (isT && last.emailSent) em++; if (isT && last.attachments) at++;
-      g.append(card(nm(a), sched(a), last, {icon:"A"+a.n, color:a.color, stale: last && !isT, query:`subject:"[HOPT Agent ${a.n}]"`,
+      if (isT && last.status !== "error") rep++; if (isT) { em += arr(last.highlights).length; at += arr(last.sources).length; }
+      g.append(card(nm(a), sched(a), last, {icon:"A"+a.n, color:a.color, stale: last && !isT, prev: RUNS.filter(r => r.agent === a.code && r !== last).slice(0,10),
         emptyText: isWork ? t("emptyToday",{t:String(a.h).padStart(2,"0")+":"+a.m}) : t("emptyWeekend")}));
     });
     const N = mine.length || 0;
-    $("#kReported").textContent = N ? rep+"/"+N : "–"; $("#kEmail").textContent = N ? em+"/"+N : "–"; $("#kAttach").textContent = N ? at+"/"+N : "–";
+    $("#kReported").textContent = N ? rep+"/"+N : "–"; $("#kEmail").textContent = N ? String(em) : "–"; $("#kAttach").textContent = N ? String(at) : "–";
     // RECOS (only roles with A4)
     $("#recoSec").style.display = ALLOWED.has("A4") ? "" : "none";
     const a4 = latest("A4"), box = $("#recoBox"); box.replaceChildren();
@@ -369,11 +412,11 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     }
     // WEEK / YEAR
     const wg = $("#weekGrid"); wg.replaceChildren(); const wk = RUNS.filter(r => r.agent === "W");
-    if (!wk.length) wg.append(card(nm(WEEKLY), sched(WEEKLY), null, {icon:"W", color:"#0F4C75", query:'subject:"[HOPT Tuần]"', emptyText:t("emptyWeek")}));
-    wk.slice(0,6).forEach((r,i) => wg.append(card(nm(WEEKLY) + (r.period ? " · " + str(loc(r,"period"),40) : ""), sched(WEEKLY), r, {icon:"W", color:"#0F4C75", query:'subject:"[HOPT Tuần]"', maxHl: i ? 3 : 6})));
+    if (!wk.length) wg.append(card(nm(WEEKLY), sched(WEEKLY), null, {icon:"W", color:"#0F4C75", emptyText:t("emptyWeek")}));
+    wk.slice(0,6).forEach((r,i) => wg.append(card(nm(WEEKLY) + (r.period ? " · " + str(loc(r,"period"),40) : ""), sched(WEEKLY), r, {icon:"W", color:"#0F4C75", maxHl: i ? 3 : 6, open: !i})));
     const yg = $("#yearGrid"); yg.replaceChildren(); const yr = RUNS.filter(r => r.agent === "Y");
-    if (!yr.length) yg.append(card(nm(YEARLY), sched(YEARLY), null, {icon:"Y", color:"#1D7874", query:'subject:"[HOPT Năm]"', emptyText:t("emptyYear")}));
-    yr.slice(0,4).forEach(r => yg.append(card(nm(YEARLY) + (r.period ? " · " + str(loc(r,"period"),40) : ""), sched(YEARLY), r, {icon:"Y", color:"#1D7874", query:'subject:"[HOPT Năm]"', maxHl:8})));
+    if (!yr.length) yg.append(card(nm(YEARLY), sched(YEARLY), null, {icon:"Y", color:"#1D7874", emptyText:t("emptyYear")}));
+    yr.slice(0,4).forEach(r => yg.append(card(nm(YEARLY) + (r.period ? " · " + str(loc(r,"period"),40) : ""), sched(YEARLY), r, {icon:"Y", color:"#1D7874", maxHl:8})));
     // LOG
     const days = []; for (let i=13;i>=0;i--){ const d = vnNow(); d.setUTCDate(d.getUTCDate()-i); days.push(ymd(d)); }
     const hm = $("#heat"); hm.replaceChildren(); hm.style.gridTemplateColumns = "auto repeat(14, minmax(28px,1fr))";
@@ -381,15 +424,14 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     let errs = 0, tot = 0;
     mine.forEach(a => { hm.append(el("div","lab","Agent "+a.n+" · "+sh(a)));
       days.forEach(d => { const r = RUNS.find(x => x.agent === a.code && x.date === d), c = el("div","cell");
-        if (r){ tot++; if (r.status==="error"){ c.classList.add("err"); errs++; } else if (!r.attachments) c.classList.add("part"); else c.classList.add("ok"); c.title = `${sh(a)} ${fmtDate(d)}: ${status(r)[0]}`; }
+        if (r){ tot++; if (r.status==="error"){ c.classList.add("err"); errs++; } else c.classList.add("ok"); c.title = `${sh(a)} ${fmtDate(d)}: ${status(r)[0]}`; }
         else c.title = `${sh(a)} ${fmtDate(d)}: ${t("lgNone")}`; hm.append(c); }); });
     $("#kErr").textContent = N ? String(errs) : "–"; $("#kErrS").textContent = t("kErrS",{n:tot});
     const lt = $("#logTable"); lt.replaceChildren();
     if (!RUNS.length){ lt.append(el("div","empty",t("emptyLog"))); return; }
-    lt.append(table([t("thDate"),t("thAgent"),t("thStatus"),t("thEmail"),t("thAtt"),t("thDone"),t("thNote")], RUNS.slice(0,40).map(r => { const tr = el("tr"), ag = AGENTS.find(a => a.code===r.agent);
+    lt.append(table([t("thDate"),t("thAgent"),t("thStatus"),t("thDone"),t("thNote")], RUNS.slice(0,40).map(r => { const tr = el("tr"), ag = AGENTS.find(a => a.code===r.agent);
       tr.append(el("td","mono",fmtDate(r.date))); tr.append(el("td",null, ag ? "Agent "+ag.n+" · "+sh(ag) : r.agent==="W" ? t("weekly") : r.agent==="Y" ? t("yearly") : str(r.agent,12)));
       const td = el("td"), [l,c] = status(r), p = el("span","pill "+c,l); p.style.marginLeft = "0"; td.append(p); tr.append(td);
-      tr.append(el("td",null, r.emailSent ? t("sent") : t("notSent"))); tr.append(el("td",null, r.attachments ? t("yes") : t("no")));
       tr.append(el("td","mono",fmtTime(r.finishedAt))); tr.append(el("td",null,str(loc(r,"note"),90))); return tr; })));
   }
 
@@ -475,6 +517,9 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
         emailSent:!(i===2&&k===1), attachments:!(i===2&&k===1)&&!(i===4&&k===3), highlights:[P+"1 · "+sh(a), P+"2", P+"3"],
         kpis:[{label:"A",value:String(3+k)},{label:"B",value:String(1+i%3)},{label:"C",value:"–"},{label:"D",value:"0"}],
         recos: a.code==="A4" ? [{title:P+"1",confidence:"Cao",next7:P+"…"},{title:P+"2",confidence:"Vừa",next7:P+"…"},{title:P+"3",confidence:"Thấp",next7:P+"…"}] : undefined,
+        charts:[{type:"barh",title:P+"Số mục theo nhóm",labels:["Nội soi","AI","IoT","VN"],values:[3+k,2,1,i%3+1],source:P}],
+        sections:[{title:P+"1. Năm điểm chính",html:"<ol><li>"+P+"…</li></ol>"},{title:P+"2. Bảng",html:"<table><tr><th>Tên</th><th>Nguồn</th></tr><tr><td>"+P+"</td><td><a href='https://example.org'>link</a></td></tr></table>"}],
+        sources:[{title:P+"Nguồn mẫu",url:"https://example.org",label:"Thứ cấp – 2 nguồn"}],
         note:(i===2&&k===1) ? P+"error" : ""})); }
     runs.push({agent:"W", date:d(4), period:"—", status:"ok", finishedAt:iso(4,8,52), emailSent:true, attachments:true, highlights:[P+"W"], kpis:[{label:"W",value:"12"}]});
     MODE = "demo"; ROLE = "admin"; ALLOWED = new Set(["A1","A2","A3","A4","W","Y"]);

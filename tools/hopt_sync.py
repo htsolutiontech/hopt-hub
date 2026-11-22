@@ -18,7 +18,10 @@ import hopt_encrypt  # noqa: E402
 
 GROUPS = hopt_encrypt.GROUPS
 KEEP = ["id", "agent", "kind", "date", "period", "period_en", "status", "finishedAt", "emailSent", "attachments",
-        "highlights", "highlights_en", "kpis", "recos", "note", "note_en"]
+        "highlights", "highlights_en", "kpis", "recos", "note", "note_en",
+        "title", "title_en", "sections", "sources", "charts"]
+FULL = ("sections", "sources", "charts")   # nội dung báo cáo đầy đủ – nặng, chỉ giữ cho các lượt gần nhất
+FULL_KEEP = 10                            # số lượt gần nhất mỗi nhóm agent được giữ báo cáo đầy đủ
 MAX_RUNS = 400
 STALE_H = 24
 
@@ -65,6 +68,11 @@ def load_export(path):
         if key not in best or str(r.get("finishedAt", "")) > str(best[key].get("finishedAt", "")):
             best[key] = r
     out = sorted(best.values(), key=lambda r: str(r.get("finishedAt", "")), reverse=True)[:MAX_RUNS]
+    seen = {}
+    for r in out:  # lượt cũ hơn FULL_KEEP của mỗi nhóm: bỏ phần báo cáo đầy đủ, giữ điểm chính/kpis
+        g = r.get("agent"); seen[g] = seen.get(g, 0) + 1
+        if seen[g] > FULL_KEEP:
+            for k in FULL: r.pop(k, None)
     return out, len(items)
 
 
@@ -141,6 +149,10 @@ def main():
             for h in (r.get(f) or [])[:3]:
                 if isinstance(h, str) and len(h) > 12 and h in blob:
                     sys.exit("LỖI: phát hiện văn bản gốc trong file xuất – dừng, KHÔNG commit.")
+        for sec in (r.get("sections") or [])[:2]:
+            h = sec.get("html") if isinstance(sec, dict) else None
+            if isinstance(h, str) and len(h) > 40 and h[:40] in blob:
+                sys.exit("LỖI: phát hiện nội dung báo cáo gốc trong file xuất – dừng, KHÔNG commit.")
         for f in ("note", "note_en"):
             v = r.get(f)
             if isinstance(v, str) and len(v) > 12 and v in blob:
