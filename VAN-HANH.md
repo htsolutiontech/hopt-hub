@@ -3,12 +3,17 @@
 ## Luồng dữ liệu
 1. 08:30–08:46 (T2–T6): HOPT Agent 1–4 chạy → gửi email → ghi lượt vào HOPT Intelligence Hub (`runs/<A?>-<YYYYMMDD>`).
 2. 09:05 và 12:05 (hằng ngày): scheduled task **HOPT GitHub Sync** đọc Hub → `tools/hopt_sync.py` mã hóa → commit `data/runs.json` + `data/status.json` → GitHub Pages.
-3. 10:17 (T2–T7): GitHub Actions `hopt-guard` kiểm tra dữ liệu có phải của ngày làm việc gần nhất không; nếu không thì lượt chạy báo lỗi và GitHub gửi email.
+3. GitHub Actions `hopt-guard` (`.github/workflows/hopt-guard.yml`) chạy 10:17 (T2–T7) và 13:17 (T2–T6): kiểm tra đủ file công cụ, dữ liệu đã mã hóa, và có lượt của ngày làm việc gần nhất. Lỗi bất kỳ bước nào → lượt chạy thất bại → GitHub gửi email "Run failed: hopt-guard". Mỗi lần push vào `data/` hoặc `tools/` cũng chạy kiểm tra an toàn.
+   - Email cảnh báo cần bật: GitHub › Settings › Notifications › Actions › "Send notifications for failed workflows only" (Email).
+   - Chạy tay: tab Actions › hopt-guard › Run workflow.
 
 ## Điều kiện bắt buộc
 - Claude GitHub App phải được cài cho repo `htsolutiontech/hopt-hub` (quyền Contents: Read & write):
   https://github.com/apps/claude/installations/select_target
   Thiếu bước này thì tác vụ đồng bộ không push được (lỗi 403). Đây là lý do repo đứng yên từ 11/11.
+
+## Không xóa các file sau
+`keys.json`, `tools/hopt_encrypt.py`, `tools/hopt_sync.py`, `tools/hopt_guard.py`, `.github/workflows/hopt-guard.yml`. Thiếu `hopt_encrypt.py` là lý do repo đứng yên từ 17/11 (sync báo lỗi import). Khi tải lại thư mục `tools/` qua giao diện web, phải tải đủ cả 3 file.
 
 ## Lệnh thủ công
 ```bash

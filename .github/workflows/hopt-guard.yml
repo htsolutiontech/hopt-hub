@@ -1,0 +1,57 @@
+name: hopt-guard
+
+# Cảnh báo khi dữ liệu HOPT Hub ngừng cập nhật hoặc bị công khai chưa mã hóa.
+# Lượt chạy lỗi => GitHub gửi email "Run failed: hopt-guard" tới chủ repo
+# (Settings › Notifications › Actions: bật "Send notifications for failed workflows only").
+on:
+  schedule:
+    - cron: "17 3 * * 1-6"   # 10:17 giờ VN, thứ Hai–thứ Bảy (sau lượt Sync 09:05)
+    - cron: "17 6 * * 1-5"   # 13:17 giờ VN, thứ Hai–thứ Sáu (sau lượt Sync 12:05)
+  push:
+    branches: [main]
+    paths: ["data/**", "tools/**", ".github/workflows/hopt-guard.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hopt-guard
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Kiểm tra đủ công cụ đồng bộ
+        run: |
+          missing=0
+          for f in keys.json tools/hopt_encrypt.py tools/hopt_sync.py tools/hopt_guard.py; do
+            if [ ! -f "$f" ]; then echo "::error::Thiếu $f – tác vụ HOPT GitHub Sync sẽ không chạy được."; missing=1; fi
+          done
+          exit $missing
+
+      - name: An toàn – dữ liệu công khai phải mã hóa
+        run: python3 tools/hopt_guard.py safety
+
+      - name: Độ tươi – phải có lượt của ngày làm việc gần nhất
+        # Lượt push chỉ kiểm tra an toàn; độ tươi kiểm tra theo lịch và khi chạy tay.
+        if: github.event_name != 'push'
+        run: python3 tools/hopt_guard.py freshness
+
+      - name: Tóm tắt
+        if: always()
+        run: |
+          {
+            echo "### HOPT Hub – trạng thái dữ liệu"
+            echo '```json'
+            cat data/status.json 2>/dev/null || echo "(chưa có data/status.json)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
