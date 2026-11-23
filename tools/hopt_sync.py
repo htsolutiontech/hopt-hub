@@ -11,7 +11,7 @@ Trường *_en (bản dịch) nếu có sẽ được giữ nguyên.
 
 Mã thoát: 0 = đã ghi file mới (cần commit) · 3 = không có thay đổi (bỏ qua commit) · khác = lỗi (KHÔNG commit).
 """
-import argparse, datetime, json, os, sys
+import argparse, datetime, json, os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import hopt_encrypt  # noqa: E402
@@ -24,6 +24,32 @@ FULL = ("sections", "sources", "charts")   # nội dung báo cáo đầy đủ �
 FULL_KEEP = 10                            # số lượt gần nhất mỗi nhóm agent được giữ báo cáo đầy đủ
 MAX_RUNS = 400
 STALE_H = 24
+
+
+ASM = re.compile(r"^\s*[\[(]?\s*(giả định|giả thiết|các giả định|assumptions?)\b", re.I)
+ASM_BLOCK = re.compile(r"<(p|li|tr|div|blockquote|h[3-6])\b[^>]*>\s*(?:<[^>]+>\s*)*(?:giả định|giả thiết|assumptions?)\b.*?</\1>", re.I | re.S)
+
+
+def strip_assumptions(r):
+    """Bỏ mục/đoạn 'Giả định' (không hiển thị trên site) và nguồn không có URL hợp lệ."""
+    secs = []
+    for sec in r.get("sections") or []:
+        if not isinstance(sec, dict) or ASM.search(str(sec.get("title", ""))):
+            continue
+        html = ASM_BLOCK.sub("", str(sec.get("html", "")))
+        if re.sub(r"<[^>]*>|\s", "", html):
+            secs.append({**sec, "html": html})
+    if "sections" in r:
+        r["sections"] = secs
+    for f in ("highlights", "highlights_en"):
+        if isinstance(r.get(f), list):
+            r[f] = [x for x in r[f] if not ASM.search(str(x))]
+    for f in ("note", "note_en"):
+        if ASM.search(str(r.get(f, ""))):
+            r[f] = ""
+    if isinstance(r.get("sources"), list):
+        r["sources"] = [x for x in r["sources"] if isinstance(x, dict) and re.match(r"^https?://", str(x.get("url", ""))) and "claude.ai" not in str(x.get("url", ""))]
+    return r
 
 
 def now_utc():
@@ -60,7 +86,7 @@ def load_export(path):
             rec["id"] = it["id"]
         if rec.get("agent") not in GROUPS:
             continue
-        runs.append({k: rec[k] for k in KEEP if k in rec})
+        runs.append(strip_assumptions({k: rec[k] for k in KEEP if k in rec}))
     # khử trùng theo id (giữ bản finishedAt mới nhất)
     best = {}
     for r in runs:
