@@ -149,7 +149,7 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
       <div id="recoBox"></div>
     </div>
   </section>
-  <section class="view" id="v-week"><div class="grid" id="weekGrid"></div></section>
+  <section class="view" id="v-week"><div class="card" id="weekSyn" style="margin-bottom:16px"></div><div class="grid" id="weekGrid"></div></section>
   <section class="view" id="v-year"><div class="grid" id="yearGrid"></div></section>
   <section class="view" id="v-log">
     <div class="sec" style="margin-top:0"><h2 data-i="logH14"></h2>
@@ -267,7 +267,8 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
   const fmtDate = s => s && /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(8,10)+"/"+s.slice(5,7)+"/"+s.slice(0,4) : str(s,20);
 
   // ================= state =================
-  let RUNS = [];               // decrypted, allowed runs only
+  let RUNS = [];
+  const CL = a => (window.Insight ? a.map(window.Insight.cleanRun) : a);   // bỏ mục/đoạn "Giả định"               // decrypted, allowed runs only
   let ROLE = null;             // "admin" | "user1".. | "owner"
   let ALLOWED = new Set();     // agent groups this role may see
   let KEYS = null, PRIV = null, MODE = "init"; // MODE: init|db|repo|demo|none
@@ -289,7 +290,7 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
 
   // ================= tabs (hash) =================
   const VIEWS = ["today","week","year","log"];
-  function visibleViews(){ return VIEWS.filter(v => (v==="week" ? ALLOWED.has("W") : v==="year" ? ALLOWED.has("Y") : true)); }
+  function visibleViews(){ return VIEWS.filter(v => (v==="week" ? (ALLOWED.has("W") || AGENTS.some(a => ALLOWED.has(a.code))) : v==="year" ? ALLOWED.has("Y") : true)); }
   function show(){
     const vis = visibleViews();
     document.querySelectorAll(".tab").forEach(tb => tb.style.display = vis.includes(tb.dataset.v) ? "" : "none");
@@ -420,7 +421,9 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     }
     // WEEK / YEAR
     const wg = $("#weekGrid"); wg.replaceChildren(); const wk = RUNS.filter(r => r.agent === "W");
-    if (!wk.length) wg.append(card(nm(WEEKLY), sched(WEEKLY), null, {icon:"W", color:"#0F4C75", emptyText:t("emptyWeek")}));
+    const ws = $("#weekSyn"), wsH = window.Insight ? window.Insight.weekly(LANG, AGENTS.filter(a => ALLOWED.has(a.code)).map(a => ({name: "Agent "+a.n+" · "+sh(a), runs: RUNS.filter(r => r.agent === a.code)})), ymd(vnNow())) : "";
+    ws.innerHTML = wsH; ws.style.display = wsH ? "" : "none";
+    if (!wk.length && ALLOWED.has("W") && !wsH) wg.append(card(nm(WEEKLY), sched(WEEKLY), null, {icon:"W", color:"#0F4C75", emptyText:t("emptyWeek")}));
     wk.slice(0,6).forEach((r,i) => wg.append(card(nm(WEEKLY) + (r.period ? " · " + str(loc(r,"period"),40) : ""), sched(WEEKLY), r, {icon:"W", color:"#0F4C75", maxHl: i ? 3 : 6, open: !i})));
     const yg = $("#yearGrid"); yg.replaceChildren(); const yr = RUNS.filter(r => r.agent === "Y");
     if (!yr.length) yg.append(card(nm(YEARLY), sched(YEARLY), null, {icon:"Y", color:"#1D7874", emptyText:t("emptyYear")}));
@@ -497,7 +500,7 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
   async function refreshRepo(){
     if (!PRIV) return;
     try { lastDoc = await fetchJson("data/runs.json"); } catch(e){ if (!lastDoc) { banner("bNoDb"); return; } }
-    RUNS = await decryptAll(lastDoc);
+    RUNS = CL(await decryptAll(lastDoc));
     setConn("live","connRepo",{n:RUNS.length, t:fmtTime(lastDoc.updatedAt)});
     banner(RUNS.length ? null : "bEmptyRole"); userChip(); show(); render();
   }
@@ -506,7 +509,7 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     try { doc = await fetchJson("data/runs.json"); } catch(e){}
     if (doc && !doc.encrypted && arr(doc.runs).length){   // legacy plaintext file
       MODE = "repo"; ROLE = "admin"; ALLOWED = new Set(["A1","A2","A3","A4","W","Y"]);
-      RUNS = arr(doc.runs).filter(r => r && typeof r.agent === "string").sort((x,y) => String(y.finishedAt||"").localeCompare(String(x.finishedAt||"")));
+      RUNS = CL(arr(doc.runs).filter(r => r && typeof r.agent === "string").sort((x,y) => String(y.finishedAt||"").localeCompare(String(x.finishedAt||""))));
       setConn("warn","connRepo",{n:RUNS.length,t:fmtTime(doc.updatedAt)}); banner("bPlain"); userChip(); show(); render(); return;
     }
     try { KEYS = await fetchJson("keys.json"); } catch(e){ KEYS = null; }
@@ -526,12 +529,12 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
         kpis:[{label:P+"Tổng mục đã kiểm chứng",value:String(6+(i*3+k)%5),note:P+"đếm trong báo cáo"},{label:P+"Cảnh báo/thu hồi",value:String(1+i%3),note:P+"fda.gov"},{label:P+"Tỷ giá USD/VND",value:(25990-i*15).toLocaleString("vi-VN"),note:P+"vietcombank.com.vn"},{label:P+"Lợi suất 10 năm",value:(4.8+i*0.03).toFixed(2).replace(".",",")+"%",note:P+"treasury.gov"}],
         recos: a.code==="A4" ? [{title:P+"1",confidence:"Cao",next7:P+"…"},{title:P+"2",confidence:"Vừa",next7:P+"…"},{title:P+"3",confidence:"Thấp",next7:P+"…"}] : undefined,
         charts:[{type:"barh",title:P+"Số mục theo nhóm",labels:["Nội soi","AI","IoT","VN"],values:[3+k,2,1,i%3+1],source:P}],
-        sections:[{title:P+"1. Năm điểm chính",html:"<ol><li>"+P+"…</li></ol>"},{title:P+"2. Bảng",html:"<table><tr><th>Tên</th><th>Nguồn</th></tr><tr><td>"+P+"</td><td><a href='https://example.org'>link</a></td></tr></table>"}],
+        sections:[{title:"Giả định",html:"<p><b>Giả định:</b> "+P+"không được hiển thị</p>"},{title:P+"1. Năm điểm chính",html:"<ol><li>"+P+"…</li></ol>"},{title:P+"2. Bảng",html:"<table><tr><th>Tên</th><th>Nguồn</th></tr><tr><td>"+P+"</td><td><a href='https://example.org'>link</a></td></tr></table>"}],
         sources:[{title:P+"Nguồn mẫu cố định",url:"https://example.org",label:"Nguồn gốc"},{title:P+"Nguồn theo ngày "+d(i),url:"https://example.org/"+d(i),label:i%2?"Thứ cấp – 2 nguồn":"1 nguồn – chưa xác nhận"}],
         note:(i===2&&k===1) ? P+"error" : ""})); }
     runs.push({agent:"W", date:d(4), period:"—", status:"ok", finishedAt:iso(4,8,52), emailSent:true, attachments:true, highlights:[P+"W"], kpis:[{label:"W",value:"12"}]});
     MODE = "demo"; ROLE = "admin"; ALLOWED = new Set(["A1","A2","A3","A4","W","Y"]);
-    RUNS = runs.sort((x,y) => String(y.finishedAt).localeCompare(String(x.finishedAt)));
+    RUNS = CL(runs.sort((x,y) => String(y.finishedAt).localeCompare(String(x.finishedAt))));
     setConn("warn","connDemo"); banner("bDemo"); staleState = null; renderStale(); userChip(); show(); render();
   }
 
@@ -569,7 +572,7 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     const timer = setTimeout(() => { setConn("warn","connWait"); banner("bTimeout"); }, 10000);
     db.collection("runs").orderBy("finishedAt","desc").limit(300).onSnapshot(snap => {
       if (!snap.metadata.fromCache){ clearTimeout(timer); banner(null); }
-      RUNS = snap.docs.map(d => ({id:d.id, ...(d.data()||{})})).filter(r => r && typeof r.agent === "string");
+      RUNS = CL(snap.docs.map(d => ({id:d.id, ...(d.data()||{})})).filter(r => r && typeof r.agent === "string"));
       setConn("live", snap.metadata.fromCache ? "connSync" : "connLive", {n:RUNS.length}); render();
     }, err => { clearTimeout(timer); setConn("warn","connNo"); banner("bLost",{c:(err && err.code) || "error"}); });
   })();
