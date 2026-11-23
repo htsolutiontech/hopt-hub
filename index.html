@@ -142,6 +142,7 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
 
   <section class="view" id="v-today">
     <div class="grid" id="todayGrid"></div>
+    <div class="sec" id="movSec" style="display:none"><h2 data-i="movH"></h2><p class="sub" data-i="movS"></p><div class="card" id="movBox"></div></div>
     <div class="sec" id="recoSec">
       <h2 data-i="recoH"></h2>
       <p class="sub" id="recoSub"></p>
@@ -179,12 +180,13 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
   </form>
 </div>
 
+<script src="insight.js"></script>
 <script>
 (() => {
   // ================= i18n =================
   const I18N = {
     vi:{tagline:"Radar thiết bị · Tài chính · Đầu tư & M&A · Chiến lược", kReported:"Agent đã báo cáo hôm nay", kReportedS:"Thứ Hai–Thứ Sáu, trước 9h00",
-      kEmail:"Điểm chính hôm nay", kEmailS:"tổng của các agent", kAttach:"Nguồn trích dẫn hôm nay", kAttachS:"đã kiểm chứng, có nhãn độ tin cậy", full:"Báo cáo đầy đủ", sources:"Nguồn", prev:"Các bản trước", chSrc:"Nguồn",
+      movH:"Biến động định lượng giữa hai lượt gần nhất", movS:"Các chỉ số khớp nhãn giữa lượt mới nhất và lượt liền trước của từng agent, xếp theo mức thay đổi % lớn nhất; nguồn là ghi chú của từng chỉ số.", kEmail:"Điểm chính hôm nay", kEmailS:"tổng của các agent", kAttach:"Nguồn trích dẫn hôm nay", kAttachS:"đã kiểm chứng, có nhãn độ tin cậy", full:"Báo cáo đầy đủ", sources:"Nguồn", prev:"Các bản trước", chSrc:"Nguồn",
       kErr:"Lượt lỗi 14 ngày qua", kErrS:"trên {n} lượt chạy", tToday:"Hôm nay", tWeek:"Tổng hợp tuần", tYear:"Tổng kết năm", tLog:"Nhật ký vận hành",
       recoH:"Khuyến nghị quyết định mới nhất (Agent 4)", recoSubDef:"Tổng hợp từ Agent 1–3 và tra cứu chính sách; chi tiết và bằng chứng trong báo cáo đầy đủ của Agent 4 ở trên.",
       recoSub:"Theo báo cáo Agent 4 ngày {d}. Chi tiết, bằng chứng và nguồn trong báo cáo đầy đủ của Agent 4 ở trên.", recoEmptyNone:"Chưa có khuyến nghị. Agent 4 chạy lúc 08:46 các ngày Thứ 2–6, sau Agent 1–3.",
@@ -209,7 +211,7 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
       lRole:"Vai trò", lPw:"Mật khẩu", lBtn:"Đăng nhập", lBusy:"Đang giải mã…", lWrong:"Sai mật khẩu hoặc vai trò.", lNote:"Dữ liệu được mã hóa (RSA-OAEP + AES-256-GCM) và chỉ giải mã ngay trên thiết bị của bạn; mật khẩu không được gửi đi đâu.",
       logout:"Đăng xuất", roleAdmin:"Quản trị", ownerView:"Chủ sở hữu (claude.ai)"},
     en:{tagline:"Device radar · Finance · Investment & M&A · Strategy", kReported:"Agents reported today", kReportedS:"Mon–Fri, before 9:00 AM",
-      kEmail:"Key points today", kEmailS:"across agents", kAttach:"Sources cited today", kAttachS:"verified, with reliability labels", full:"Full report (Vietnamese)", sources:"Sources", prev:"Earlier reports", chSrc:"Source",
+      movH:"Quantitative changes between the two latest runs", movS:"Indicators matched by label between each agent's latest and previous run, ranked by largest % change; source is each indicator's note.", kEmail:"Key points today", kEmailS:"across agents", kAttach:"Sources cited today", kAttachS:"verified, with reliability labels", full:"Full report (Vietnamese)", sources:"Sources", prev:"Earlier reports", chSrc:"Source",
       kErr:"Failed runs, last 14 days", kErrS:"out of {n} runs", tToday:"Today", tWeek:"Weekly summary", tYear:"Annual review", tLog:"Operations log",
       recoH:"Latest decision recommendations (Agent 4)", recoSubDef:"Synthesised from Agents 1–3 and policy research; evidence and sources are in Agent 4's full report above.",
       recoSub:"From Agent 4's report of {d}. Evidence and sources are in Agent 4's full report above.", recoEmptyNone:"No recommendations yet. Agent 4 runs at 08:46 Mon–Fri, after Agents 1–3.",
@@ -330,17 +332,20 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     h.append(el("span","pill "+cls,lbl)); c.append(h);
     if (!run) c.append(el("div","empty", o.emptyText));
     else {
+      const IN = window.Insight, pr = (o.prev || [])[0] || null, html = h => { const d = el("div"); d.innerHTML = h; return d; };
       const k = arr(run.kpis).slice(0,4);
-      if (k.length){ const m = el("div","minis"); k.forEach(x => { const b = el("div","mini"); b.append(el("b",null,str(x && x.value,24))); b.append(el("span",null,str(loc(x,"label"),48))); b.title = str(loc(x,"note"),120); m.append(b); }); c.append(m); }
+      if (IN && k.length) c.append(html(IN.kpiTiles(LANG, run, pr, [run].concat(o.prev || []))));
+      else if (k.length){ const m = el("div","minis"); k.forEach(x => { const b = el("div","mini"); b.append(el("b",null,str(x && x.value,24))); b.append(el("span",null,str(loc(x,"label"),48))); b.title = str(loc(x,"note"),120); m.append(b); }); c.append(m); }
       const hl = locArr(run,"highlights").slice(0, o.maxHl || 5);
       if (hl.length){ const ul = el("ul","hl"); hl.forEach(x => ul.append(el("li",null,str(x,260)))); c.append(ul); }
       else c.append(el("div","empty",t("noHl")));
       if (run.status === "error" && run.note) c.append(el("div","empty", t("note")+": "+str(loc(run,"note"),120)));
-      full(c, run, o.open);
+      if (IN && o.prev) c.append(html(IN.compare(LANG, run, pr, {open: true})));
+      full(c, run, o.open, pr, true);
       if (o.prev && o.prev.length){ const pv = el("details","prev"); pv.append(el("summary",null,t("prev")+" ("+o.prev.length+")"));
-        o.prev.forEach(r => { const d = el("details"); d.append(el("summary",null,fmtDate(r.date)+(r.period ? " · "+str(loc(r,"period"),40) : "")));
+        o.prev.forEach((r, ix) => { const d = el("details"); d.append(el("summary",null,fmtDate(r.date)+(r.period ? " · "+str(loc(r,"period"),40) : "")));
           const hl2 = locArr(r,"highlights"); if (hl2.length){ const ul = el("ul","hl"); hl2.forEach(x => ul.append(el("li",null,str(x,260)))); d.append(ul); }
-          full(d, r, false); pv.append(d); });
+          full(d, r, false, o.prev[ix+1] || null, true); pv.append(d); });
         c.append(pv); }
     }
     return c;
@@ -369,12 +374,13 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     if (ch.source) w.append(el("div","cs",t("chSrc")+": "+str(ch.source,160)));
     return w;
   }
-  function full(c, run, open){
+  function full(c, run, open, prev, detail){
     const charts = arr(run.charts).map(chart).filter(Boolean);
     if (charts.length){ const g = el("div","charts"); charts.forEach(x => g.append(x)); c.append(g); }
     const secs = arr(run.sections).filter(x => x && x.html);
     if (secs.length){ const d = el("details","full"); if (open) d.open = true; d.append(el("summary",null,t("full")));
       secs.forEach(x => { d.append(el("h4",null,str(x.title,140))); d.append(safeHTML(x.html)); }); c.append(d); }
+    if (detail && window.Insight){ const h = window.Insight.sources(LANG, run, prev, {open:false}); if (h){ const d = el("div"); d.innerHTML = h; c.append(d); } return; }
     const src = arr(run.sources).filter(x => x && /^https?:/i.test(x.url||"") && !/claude\.ai/i.test(x.url));
     if (src.length){ const d = el("details","full"); d.append(el("summary",null,t("sources")+" ("+src.length+")")); const ol = el("ol","src");
       src.forEach(x => { const li = el("li"), a = el("a",null,str(x.title || x.url,160)); a.href = x.url; a.target = "_blank"; a.rel = "noopener"; li.append(a); if (x.label) li.append(el("span","lb",str(x.label,40))); ol.append(li); });
@@ -396,6 +402,8 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
         emptyText: isWork ? t("emptyToday",{t:String(a.h).padStart(2,"0")+":"+a.m}) : t("emptyWeekend")}));
     });
     const N = mine.length || 0;
+    const mv = window.Insight ? window.Insight.movers(LANG, mine.map(a => { const rs = RUNS.filter(r => r.agent === a.code); return {name: a.n+". "+sh(a), cur: rs[0], prev: rs[1]}; }), 12) : "";
+    $("#movSec").style.display = mv ? "" : "none"; $("#movBox").innerHTML = mv;
     $("#kReported").textContent = N ? rep+"/"+N : "–"; $("#kEmail").textContent = N ? String(em) : "–"; $("#kAttach").textContent = N ? String(at) : "–";
     // RECOS (only roles with A4)
     $("#recoSec").style.display = ALLOWED.has("A4") ? "" : "none";
@@ -515,11 +523,11 @@ footer{max-width:1240px;margin:0 auto;padding:18px 20px 30px;color:var(--mute);f
     for (let i=0;i<10;i++){ const w = new Date(Date.parse(d(i))).getUTCDay(); if (w===0||w===6) continue;
       AGENTS.forEach((a,k) => runs.push({agent:a.code, date:d(i), status:(i===2&&k===1)?"error":"ok", finishedAt:iso(i,8,40+k*4),
         emailSent:!(i===2&&k===1), attachments:!(i===2&&k===1)&&!(i===4&&k===3), highlights:[P+"1 · "+sh(a), P+"2", P+"3"],
-        kpis:[{label:"A",value:String(3+k)},{label:"B",value:String(1+i%3)},{label:"C",value:"–"},{label:"D",value:"0"}],
+        kpis:[{label:P+"Tổng mục đã kiểm chứng",value:String(6+(i*3+k)%5),note:P+"đếm trong báo cáo"},{label:P+"Cảnh báo/thu hồi",value:String(1+i%3),note:P+"fda.gov"},{label:P+"Tỷ giá USD/VND",value:(25990-i*15).toLocaleString("vi-VN"),note:P+"vietcombank.com.vn"},{label:P+"Lợi suất 10 năm",value:(4.8+i*0.03).toFixed(2).replace(".",",")+"%",note:P+"treasury.gov"}],
         recos: a.code==="A4" ? [{title:P+"1",confidence:"Cao",next7:P+"…"},{title:P+"2",confidence:"Vừa",next7:P+"…"},{title:P+"3",confidence:"Thấp",next7:P+"…"}] : undefined,
         charts:[{type:"barh",title:P+"Số mục theo nhóm",labels:["Nội soi","AI","IoT","VN"],values:[3+k,2,1,i%3+1],source:P}],
         sections:[{title:P+"1. Năm điểm chính",html:"<ol><li>"+P+"…</li></ol>"},{title:P+"2. Bảng",html:"<table><tr><th>Tên</th><th>Nguồn</th></tr><tr><td>"+P+"</td><td><a href='https://example.org'>link</a></td></tr></table>"}],
-        sources:[{title:P+"Nguồn mẫu",url:"https://example.org",label:"Thứ cấp – 2 nguồn"}],
+        sources:[{title:P+"Nguồn mẫu cố định",url:"https://example.org",label:"Nguồn gốc"},{title:P+"Nguồn theo ngày "+d(i),url:"https://example.org/"+d(i),label:i%2?"Thứ cấp – 2 nguồn":"1 nguồn – chưa xác nhận"}],
         note:(i===2&&k===1) ? P+"error" : ""})); }
     runs.push({agent:"W", date:d(4), period:"—", status:"ok", finishedAt:iso(4,8,52), emailSent:true, attachments:true, highlights:[P+"W"], kpis:[{label:"W",value:"12"}]});
     MODE = "demo"; ROLE = "admin"; ALLOWED = new Set(["A1","A2","A3","A4","W","Y"]);
