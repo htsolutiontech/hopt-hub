@@ -1,14 +1,14 @@
 {
  "version": 1,
  "source": "HOPT Intelligence Hub",
- "updatedAt": "2026-11-24T07:15:29Z",
- "latestFinishedAt": "2026-11-24T07:13:54Z",
- "total": 11,
+ "updatedAt": "2026-11-24T07:35:51Z",
+ "latestFinishedAt": "2026-11-24T07:29:18Z",
+ "total": 13,
  "groups": {
   "A1": {
-   "count": 3,
-   "lastDate": "2026-11-22",
-   "lastFinishedAt": "2026-11-22T08:59:30Z",
+   "count": 4,
+   "lastDate": "2026-11-24",
+   "lastFinishedAt": "2026-11-24T07:18:00Z",
    "lastStatus": "ok"
   },
   "A2": {
@@ -24,9 +24,9 @@
    "lastStatus": "ok"
   },
   "A4": {
-   "count": 1,
-   "lastDate": "2026-11-22",
-   "lastFinishedAt": "2026-11-22T09:12:00Z",
+   "count": 2,
+   "lastDate": "2026-11-24",
+   "lastFinishedAt": "2026-11-24T07:29:18Z",
    "lastStatus": "ok"
   },
   "W": {
